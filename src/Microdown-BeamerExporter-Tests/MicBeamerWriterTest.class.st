@@ -1,8 +1,9 @@
 Class {
 	#name : 'MicBeamerWriterTest',
-	#superclass : 'MicLaTeXWriterTest',
-	#category : 'Microdown-BeamerExporter-Tests',
-	#package : 'Microdown-BeamerExporter-Tests'
+	#superclass : 'MicAbstractLaTexWriterTest',
+	#category : 'Microdown-BeamerExporter-Tests-Slide',
+	#package : 'Microdown-BeamerExporter-Tests',
+	#tag : 'Slide'
 }
 
 { #category : 'tests' }
@@ -21,38 +22,69 @@ MicBeamerWriterTest >> actualClass [
 	^ MicBeamerWriter 
 ]
 
+{ #category : 'running' }
+MicBeamerWriterTest >> setUp [
+
+	super setUp.
+	self parser: Microdown. 
+	self 
+]
+
 { #category : 'tests' }
 MicBeamerWriterTest >> testCode [
 
 	self writeFor: (factory codeblockNoParamBody: 'this is a code').
-	self assert: writer contents equals: '\begin{listing}', newLine ,
+	self assert: writer contents equals: '\begin{listing}{}', newLine ,
 													'this is a code', newLine ,
 													'\end{listing}', newLine
 ]
 
 { #category : 'tests' }
-MicBeamerWriterTest >> testCodeWithCaption [
-
+MicBeamerWriterTest >> testCodeWithCaptionIgnoresCaption [
+	
 	self writeFor: (factory codeblock: 'caption=Pharo is **cool**' body: 'this is a code').
-	self assert: writer contents equals: '\begin{listing}[caption={Pharo is \textbf{cool}}]', newLine ,
+	self 
+		assert: writer contents 
+		equals: '\begin{listing}{}', newLine ,
 													'this is a code', newLine ,
 													'\end{listing}', newLine
 ]
 
 { #category : 'tests' }
-MicBeamerWriterTest >> testCodeWithLabel [
+MicBeamerWriterTest >> testCodeWithLabelIgnoresLabel [
 
 	self writeFor: (factory codeblock: 'label=Pharo' body: 'this is a code').
-	self assert: writer contents equals: '\begin{listing}[label=Pharo]', newLine ,
+	self 
+		assert: writer contents 
+		equals: '\begin{listing}{}', newLine ,
 'this is a code', newLine ,
 '\end{listing}', newLine
 ]
 
 { #category : 'tests' }
+MicBeamerWriterTest >> testCodeWithPharoCode [
+
+	self writeFor: '
+```
+| a |
+a := 40 + 2.
+^ a
+```
+'.
+	self assert: writer contents equals: '\begin{listing}{}', newLine ,
+													'| a |', newLine ,
+													'a := 40 + 2.', newLine ,
+													'^ a', newLine ,
+													'\end{listing}', newLine
+]
+
+{ #category : 'tests' }
 MicBeamerWriterTest >> testColumn [
 
-	self writeFor: (factory columnSample).
-	self assert: writer contents equals:'\begin{column}{0.42\textwidth}', newLine , newLine, 
+	self writeFor: factory columnSample.
+	self 
+		assert: writer contents 
+		equals:'\begin{column}{0.42\textwidth}', newLine , newLine, 
 'this is a \textbf{text}', newLine ,
 '\end{column}', newLine, newLine
 ]
@@ -60,8 +92,10 @@ MicBeamerWriterTest >> testColumn [
 { #category : 'tests' }
 MicBeamerWriterTest >> testColumns [
 
-	self writeFor: (factory columnsSample).
-	self assert: writer contents equals:'\begin{columns}', newLine ,
+	self writeFor: factory columnsSample.
+	self 
+		assert: writer contents 
+		equals:'\begin{columns}', newLine ,
 '\end{columns}', newLine , newLine
 ]
 

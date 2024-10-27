@@ -7,7 +7,7 @@ Class {
 		'inList'
 	],
 	#pools : [
-		'MicroSharedPool'
+		'MicSharedPool'
 	],
 	#category : 'Microdown-PrettyPrinter',
 	#package : 'Microdown-PrettyPrinter'
@@ -116,21 +116,27 @@ MicTextualMicrodownExporter >> visitAnchor: anAnchor [
 { #category : 'visit - format' }
 MicTextualMicrodownExporter >> visitAnchorReference: anAnchorReference [
 
-	builder anchorReference: anAnchorReference substring
+	builder anchorReference: anAnchorReference bodyString
 ]
 
 { #category : 'visit - block' }
 MicTextualMicrodownExporter >> visitAnnotated: anAnnotated [
 
-	builder 
-		annotated: anAnnotated label 
-		paragraph:  [ super visitAnnotated: anAnnotated  ] 
+	| textualExporter |
+	textualExporter := MicTextualMicrodownExporter new.
+	anAnnotated children do: [ :each | each accept: textualExporter ].
+
+	builder
+		annotated: anAnnotated label
+		paragraph: [ builder textWithBracket: textualExporter contents ]
 ]
 
 { #category : 'visit - format' }
 MicTextualMicrodownExporter >> visitAnnotation: anAnnotation [
 
-	builder raw: anAnnotation printString
+	builder raw: anAnnotation openingDelimiter.
+	builder raw: anAnnotation bodyString.
+	builder raw: anAnnotation closingDelimiter
 ]
 
 { #category : 'visit - format' }
@@ -176,7 +182,7 @@ MicTextualMicrodownExporter >> visitFigure: aFigure [
 	
 	builder newLine.
 	builder
-		figureURL: aFigure originUrl
+		figureURL: aFigure url
 		withCaption: [ super visitFigure: aFigure ]
 		
 ]
@@ -199,7 +205,7 @@ MicTextualMicrodownExporter >> visitHorizontalLine: aHorizontalLine [
 { #category : 'visit - format' }
 MicTextualMicrodownExporter >> visitInputFile: anInputfile [
 
-	 builder inputFile: anInputfile path originalString
+	builder inputFile: anInputfile fullNameString
 ]
 
 { #category : 'visit - format' }
@@ -235,13 +241,13 @@ MicTextualMicrodownExporter >> visitMath: aMicMath [
 { #category : 'visit - format' }
 MicTextualMicrodownExporter >> visitMathInline: aMicMathInline [
 
-	builder mathInline: aMicMathInline substring
+	builder mathInline: aMicMathInline bodyString
 ]
 
 { #category : 'visit - block' }
 MicTextualMicrodownExporter >> visitMetaData: aMetaData [
 
-	builder metaDataFromAssociations: aMetaData body
+	builder metaDataFromAssociations: aMetaData body associations
 ]
 
 { #category : 'visit - format' }
@@ -289,7 +295,7 @@ MicTextualMicrodownExporter >> visitQuote: aQuote [
 { #category : 'visit - format' }
 MicTextualMicrodownExporter >> visitRaw: aRawFormat [
 
-	builder rawFormat: aRawFormat substring
+	builder rawFormat: aRawFormat bodyString
 ]
 
 { #category : 'visit - block' }
@@ -324,13 +330,14 @@ MicTextualMicrodownExporter >> visitTable: aTable [
 
 { #category : 'visit - block' }
 MicTextualMicrodownExporter >> visitText: aMicTextBlock [
-	
-	builder text:  (self backSlashString: aMicTextBlock substring)
+
+	builder text: (self backSlashString: aMicTextBlock bodyString)
 ]
 
 { #category : 'visiting' }
 MicTextualMicrodownExporter >> visitTextWithoutBackslash: aMicTextBlock [
-	builder text: aMicTextBlock substring
+
+	builder text: aMicTextBlock bodyString
 ]
 
 { #category : 'visit - block' }

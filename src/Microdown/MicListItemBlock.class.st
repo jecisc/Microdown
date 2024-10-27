@@ -1,30 +1,30 @@
 "
-I represent one item in a list (ordered or non-ordered).
+I represent an item in a list (ordered or unordered).
 
-```
+```language=text
 1. item 1
 2. item 2
 ```
-or 
-```
+or
+```language=text
 - item 1
 - item 2
 ```
-are two lists containing 2 item list elements. 
+are two lists containing 2 list items.
 
-An item list can be on multiple lines 
+A list item can be on multiple lines:
 
-```
+```language=text
 1. item 1 **foo**
    on the same item element
 2. is another element
-3. and a third one on 
-   another line 
+3. and a third one on
+   another line
 ```
 
-Please note that I can contain nested subelements and 
+Please note that I can contain nested sub-elements:
 
-```
+```language=text
 1. item 1 **foo**
    on the same item
   - sublevel item 1 **bold**
@@ -35,16 +35,14 @@ Please note that I can contain nested subelements and
 Therefore I expose two APIs:
 - `children` which returns all the mic elements (for example the text and the nested lists)
 - `textElements` which returns only the text elements (for example `item 1 **foo** on the same item`)
-	
-Pay attention my instance variable text is only used during the parsing time. 
 
+Pay attention that my instance variable `text` is only used during parsing.
 "
 Class {
 	#name : 'MicListItemBlock',
 	#superclass : 'MicAbstractBlock',
 	#instVars : [
-		'text',
-		'textElements'
+		'text'
 	],
 	#category : 'Microdown-Model',
 	#package : 'Microdown',
@@ -71,16 +69,13 @@ MicListItemBlock >> addLineAndReturnNextNode: line [
 	"SD: I thought that a list item was holding a paragraph but it holds directly text."
 		
 	(self isAList: normalized)
-		ifTrue: [ ^ self newBlockFor: normalized parent: self ]
+		ifTrue: [ 
+			self inlineParse: text.
+			text := ''.
+			^ self newBlockFor: normalized parent: self ]
 		ifFalse: [ 
 			"here we manage multiple lines list item."
 			text := text , String cr , normalized ]
-]
-
-{ #category : 'accessing' }
-MicListItemBlock >> basicText [
-
-	^ text
 ]
 
 { #category : 'testing' }
@@ -93,19 +88,8 @@ MicListItemBlock >> canConsumeLine: line [
 { #category : 'visiting' }
 MicListItemBlock >> closeMe [
 
-"1. item 1 **foo**
-   on the same line
-  - sublevel item 1 **bold**
-  - sublevel item 2
-2. item 2
-In this example textElements of the first item will be the elements for 
-	item 1 **foo**
-   on the same line
-"
 	super closeMe.
-	textElements :=  self inlineParse: text.	
-	textElements reverseDo: [ :each | 
-		children addFirst: each ].
+	self inlineParse: text
 ]
 
 { #category : 'accessing' }
@@ -128,19 +112,19 @@ MicListItemBlock >> nestedLevel [
 ]
 
 { #category : 'accessing' }
-MicListItemBlock >> text [
+MicListItemBlock >> testText [
+	"I am used to make it easier to write tests"
+	^ String streamContents: [ :str | children do: [ :each | str nextPutAll: each printString ] ]
+]
 
-	^ String streamContents: [ :str | textElements do: [ :each | str nextPutAll: each substring ] ]
+{ #category : 'accessing' }
+MicListItemBlock >> text [
+	self deprecated: 'Use testText instead' transformWith: '`@rec text' -> '`@rec testText'.
+	^ self testText 
 ]
 
 { #category : 'accessing' }
 MicListItemBlock >> textElements [ 
-	
-	^ textElements 
-]
-
-{ #category : 'accessing' }
-MicListItemBlock >> textElements: aCollection [ 
-	
-	textElements := aCollection
+	self deprecated: 'I should not be used, use children' transformWith: '`@rec textElements' -> '`@rec children'.
+	^ children  
 ]

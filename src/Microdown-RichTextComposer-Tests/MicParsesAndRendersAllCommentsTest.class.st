@@ -10,6 +10,13 @@ Class {
 }
 
 { #category : 'tests' }
+MicParsesAndRendersAllCommentsTest >> testAsRichTextDoesNotBreakOnEmptyCodeBlock [
+	"Test that we do not break on empty code blocks"
+	Microdown asRichText: '```
+```'
+]
+
+{ #category : 'tests' }
 MicParsesAndRendersAllCommentsTest >> testCommentFromChunkReadStream [
 	"Test that we do not break on empty annotated blocks"
 	Microdown asRichText: ChunkReadStream comment.

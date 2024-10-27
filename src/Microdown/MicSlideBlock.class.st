@@ -2,7 +2,7 @@
 I'm a block element defining a slide. I expect a title and optionally a tag (to be able for example 
 to have the same slide but on two different layouts and not emit both. 
 
-```
+```language=text
 <!slide|title=This is a cool title&tag=nh5p
 
 - a list of bullet
@@ -45,4 +45,10 @@ MicSlideBlock >> tag [
 { #category : 'accessing' }
 MicSlideBlock >> title [
 	^ arguments at: 'title' ifAbsent: [ '' ]
+]
+
+{ #category : 'accessing' }
+MicSlideBlock >> title: aString [
+
+	arguments at: #title put: aString
 ]

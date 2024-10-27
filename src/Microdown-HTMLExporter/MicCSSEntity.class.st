@@ -35,6 +35,12 @@ MicCSSEntity >> basePath [
 		ifNil: [ basePath := self defaultBasePath ]
 ]
 
+{ #category : 'defaults' }
+MicCSSEntity >> basePath: anObject [
+
+	basePath := anObject
+]
+
 { #category : 'accessing' }
 MicCSSEntity >> cssFile [
 	"Answer the receiver's <MicCSSFile>"
@@ -84,7 +90,7 @@ MicCSSEntity >> defaultBasePath [
 MicCSSEntity >> defaultDestinationPath [
 	"Answer a default <String> describing the location where receiver's CSS files are stored"
 	
-	^ 'support/'
+	^ 'pharo-local/iceberg/Pillar-markup/Microdown/ressource/'
 ]
 
 { #category : 'accessing' }

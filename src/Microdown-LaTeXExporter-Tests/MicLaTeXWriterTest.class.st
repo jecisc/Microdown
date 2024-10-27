@@ -1,127 +1,11 @@
 Class {
 	#name : 'MicLaTeXWriterTest',
-	#superclass : 'ParametrizedTestCase',
-	#instVars : [
-		'parser',
-		'writer',
-		'factory',
-		'newLine'
-	],
+	#superclass : 'MicAbstractLaTexWriterTest',
 	#category : 'Microdown-LaTeXExporter-Tests',
 	#package : 'Microdown-LaTeXExporter-Tests'
 }
 
-{ #category : 'asserting' }
-MicLaTeXWriterTest class >> shouldInheritSelectors [
-	^ true
-]
-
-{ #category : 'asserting' }
-MicLaTeXWriterTest class >> testParameters [
-
-	^ ParametrizedTestMatrix new
-		  forSelector: #writer addOptions: { MicLaTeXWriter };
-		  forSelector: #factory addOptions: { MicMicrodownSnippetFactory };
-		  forSelector: #parser addOptions: { Microdown };
-		  forSelector: #newLine addOptions: { String cr . String lf . String crlf};
-		  yourself
-]
-
-{ #category : 'running' }
-MicLaTeXWriterTest >> actualClass [
-
-	^ MicLaTeXWriter
-]
-
-{ #category : 'helpers' }
-MicLaTeXWriterTest >> assert: result includesSubstring: expected [
-
-	expected ifEmpty: [ ^ self ].
-	self 
-		assert: (result includesSubstring: expected) 
-		description: ('''{1}'' not in ''{2}''' format: {expected . result})
-]
-
-{ #category : 'helpers' }
-MicLaTeXWriterTest >> assertWriting: aDocumentItem includesText: aString [
-	| result |
-	self writeForElement: aDocumentItem.
-	result := writer contents.
-	self assert: result includesSubstring: aString
-]
-
-{ #category : 'helpers' }
-MicLaTeXWriterTest >> assertWriting: aDocumentItem includesTexts: aCollection [
-	| resultString |
-	self writeForElement: aDocumentItem.
-	resultString := writer contents.
-	aCollection do: [ :testString | self assert: resultString includesSubstring: testString ]
-]
-
-{ #category : 'accessing' }
-MicLaTeXWriterTest >> factory: aFactory [
-	factory := aFactory new
-]
-
-{ #category : 'accessing' }
-MicLaTeXWriterTest >> newLine: aNewLine [
-	(aNewLine = String cr) ifTrue:[ writer crAsNewLine ].
-	(aNewLine = String lf) ifTrue:[ writer lfAsNewLine ].
-	(aNewLine = String crlf) ifTrue:[ writer crlfAsNewLine ].
-	newLine := aNewLine
-]
-
-{ #category : 'tests - formats' }
-MicLaTeXWriterTest >> parse: aString andCheckWeGet: aResultingString [
-	
-	| mic |
-	mic := parser parse: 	aString.
-	writer visit: mic.
-	self assert: writer contents equals: aResultingString
-]
-
-{ #category : 'tests - formats' }
-MicLaTeXWriterTest >> parseInlined: aString andCheckWeGet: aResultingString [
-	
-	| mic |
-	mic := parser parse: 	aString.
-	writer visit: mic.
-	self assert: writer contents equals: newLine , aResultingString, newLine
-]
-
-{ #category : 'accessing' }
-MicLaTeXWriterTest >> parser: aParser [
-	parser := aParser new
-]
-
-{ #category : 'tests' }
-MicLaTeXWriterTest >> testAnchor [
-
-	self parse: factory anchorSample andCheckWeGet: '\label{test}'
-
-]
-
-{ #category : 'tests' }
-MicLaTeXWriterTest >> testAnchorReference [
-	"Pay attention that an anchor reference only exists within a paragraph and as such a paragraph emit a newline to start."
-	
-	self parseInlined: factory anchorReferenceSample andCheckWeGet: '\ref{Foo}'
-	
-]
-
-{ #category : 'tests - formats' }
-MicLaTeXWriterTest >> testBold [
-
-	self parseInlined: factory boldFormatSample andCheckWeGet: '\textbf{Foo}'
-]
-
-{ #category : 'tests' }
-MicLaTeXWriterTest >> testCitation [
-
-	self parseInlined: '{!citation|ref=Duca99a!}' andCheckWeGet: '\cite{Duca99a}'
-]
-
-{ #category : 'tests' }
+{ #category : 'as yet unclassified' }
 MicLaTeXWriterTest >> testCodeblock [
 
 	self writeFor: (factory codeblockNoParamBody: 'this is a code').
@@ -130,7 +14,7 @@ MicLaTeXWriterTest >> testCodeblock [
 													'\end{listing}', newLine
 ]
 
-{ #category : 'tests' }
+{ #category : 'as yet unclassified' }
 MicLaTeXWriterTest >> testCodeblockWithCaption [
 
 	self writeFor: (factory codeblock: 'caption=Pharo is **cool**' body: 'this is a code').
@@ -139,7 +23,7 @@ MicLaTeXWriterTest >> testCodeblockWithCaption [
 													'\end{listing}', newLine
 ]
 
-{ #category : 'tests' }
+{ #category : 'as yet unclassified' }
 MicLaTeXWriterTest >> testCodeblockWithLabel [
 
 	self writeFor: (factory codeblock: 'label=Pharo' body: 'this is a code').
@@ -164,7 +48,7 @@ MicLaTeXWriterTest >> testCrlfAsNewLine [
 
 { #category : 'tests - figure/link' }
 MicLaTeXWriterTest >> testFigure [
-
+	
 	self writeFor: factory figureSample.
 	self assert: writer contents equals: newLine ,
 					'\begin{figure}[htpb]', newLine ,
@@ -202,6 +86,17 @@ MicLaTeXWriterTest >> testFigureRealSample [
 self flag: #todo.
 "may be we should get figures/logo.png when file://figures/logo.png"
 
+]
+
+{ #category : 'tests - figure/link' }
+MicLaTeXWriterTest >> testFigureWithEmptyCaption [
+
+	self writeFor: '![](figures/f.png)'.
+	self
+		assert: writer contents
+		equals:
+			newLine , '\begin{center}', newLine, '\includegraphics[width=1.0\textwidth]{figures/f.png}'
+			, '\end{center}', newLine, newLine
 ]
 
 { #category : 'tests' }
@@ -271,24 +166,71 @@ MicLaTeXWriterTest >> testLfAsNewLine [
 MicLaTeXWriterTest >> testLink [
 	self writeFor: factory linkSample.		
 	self assert: writer contents equals: newLine,
-'\href{/anUrl}{Foo}\footnotesize{\url{/anUrl}}', newLine
+'\href{/anUrl}{Foo}', newLine
 ]
 
 { #category : 'tests - figure/link' }
 MicLaTeXWriterTest >> testLinkBold [
 
-	self flag: 'caption do not use bold in the caption'.
 	self writeFor: factory linkBoldSample.
-	self flag: #toFix.
-	"\textbf{Foo}" 
 	self assert: writer contents equals: newLine ,
-'\href{/anUrl}{**Foo**}\footnotesize{\url{/anUrl}}', newLine
+		'\href{/anUrl}{\textbf{Foo}}', newLine
+]
+
+{ #category : 'tests - math' }
+MicLaTeXWriterTest >> testMathBloc [
+
+	self
+	parseInlined:'$$
+f(a) = \frac{1}{2\pi i} \oint_{\gamma} \frac{f(z)}{z - a} dz
+$$'
+
+	andCheckWeGet: 
+
+'\begin{equation}', newLine,
+'f(a) = \frac{1}{2\pi i} \oint_{\gamma} \frac{f(z)}{z - a} dz', newLine,
+'\end{equation}' 
+]
+
+{ #category : 'tests - math' }
+MicLaTeXWriterTest >> testMathBlocWithLabel [
+
+	self
+	parseInlined:'$$ % anchor=eq1
+f(a) = \frac{1}{2\pi i} \oint_{\gamma} \frac{f(z)}{z - a} dz
+$$'
+
+	andCheckWeGet: 
+
+'\begin{equation}', newLine,
+'\label{eq1}', newLine,
+'f(a) = \frac{1}{2\pi i} \oint_{\gamma} \frac{f(z)}{z - a} dz', newLine,
+'\end{equation}' 
+]
+
+{ #category : 'tests - math' }
+MicLaTeXWriterTest >> testMathInLine [
+
+	self
+	parseInlined: 'Similarly, let $f_{w,C}$ be the number of documents in corpus $C$ that contain word $w$:'
+
+
+	andCheckWeGet: 
+
+'Similarly, let $f_{w,C}$ be the number of documents in corpus $C$ that contain word $w$:'
 ]
 
 { #category : 'tests - formats' }
 MicLaTeXWriterTest >> testMonospace [
 
 	self parseInlined: factory monospaceFormatSample andCheckWeGet: '\code{Foo}'
+]
+
+{ #category : 'tests' }
+MicLaTeXWriterTest >> testNote [
+
+	self parseInlined: '{!note|contents=Duca99a!}' andCheckWeGet: '\comment{Duca99a}'
+	
 ]
 
 { #category : 'tests - lists' }
@@ -417,7 +359,28 @@ MicLaTeXWriterTest >> testQuote [
 MicLaTeXWriterTest >> testRealLinkSample [
 	self writeFor: factory realLinkSample.	
 	self assert: writer contents equals: newLine ,
-'\href{http://www.pharo.org}{The Pharo Project}\footnotesize{\url{http://www.pharo.org}}', newLine 
+'\href{http://www.pharo.org}{The Pharo Project}', newLine 
+]
+
+{ #category : 'tests - math' }
+MicLaTeXWriterTest >> testSimpleMathBloc [
+	
+	| root math |
+	root := parser parse: '
+$$
+f(a) = \frac{1}{2\pi i} \oint_{\gamma} \frac{f(z)}{z - a} dz
+$$'.
+	math := root children first.
+	self
+	parseInlined:'$$ 
+f(a) = \frac{1}{2\pi i} \oint_{\gamma} \frac{f(z)}{z - a} dz
+$$'
+
+	andCheckWeGet: 
+
+'\begin{equation}', newLine, 
+'f(a) = \frac{1}{2\pi i} \oint_{\gamma} \frac{f(z)}{z - a} dz', newLine,
+'\end{equation}' 
 ]
 
 { #category : 'tests - formats' }

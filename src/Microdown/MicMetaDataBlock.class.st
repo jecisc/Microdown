@@ -4,7 +4,7 @@ We will have to learn from doing the migration.
 
 In Microdown, metadata is a block level expressed as follows:  
 
-```
+```language=text
 {
     ""title"": ""Selecting Expressions"",
     ""author"": ""S. Ducasse and L. Fabresse with Q. Ducasse"",
@@ -21,9 +21,9 @@ Class {
 	#instVars : [
 		'bogusParsing'
 	],
-	#category : 'Microdown-BookRelated',
+	#category : 'Microdown-Extensions',
 	#package : 'Microdown',
-	#tag : 'BookRelated'
+	#tag : 'Extensions'
 }
 
 { #category : 'markups' }
@@ -38,6 +38,16 @@ MicMetaDataBlock >> accept: aVisitor [
 ]
 
 { #category : 'accessing' }
+MicMetaDataBlock >> atKey: aString [ 
+	^ self body at: aString
+]
+
+{ #category : 'accessing' }
+MicMetaDataBlock >> atKey: aString put: aString2 [ 
+	self body at: aString put: aString2 
+]
+
+{ #category : 'accessing' }
 MicMetaDataBlock >> bogusParsing [
 
 	^ bogusParsing
@@ -46,16 +56,28 @@ MicMetaDataBlock >> bogusParsing [
 { #category : 'markups' }
 MicMetaDataBlock >> closeMe [ 
 	super closeMe.
-	body := [ STONJSON fromString: '{', body, '}' ] on: STONReaderError do: [ :ex |
+	body := [ STONJSON fromString: '{', body, '}' ] on: Error do: [ :ex |
 		| dict |
 		bogusParsing := true.
 		dict := Dictionary new at: self keyForUnparsableContents put: body; yourself ]
 ]
 
+{ #category : 'testing' }
+MicMetaDataBlock >> includesKey: aString [ 
+	^ self body includesKey: aString 
+]
+
 { #category : 'initialization' }
-MicMetaDataBlock >> initialize [ 
+MicMetaDataBlock >> initialize [
+
 	super initialize.
 	bogusParsing := false.
+	"body := SmallDictionary new"
+]
+
+{ #category : 'testing' }
+MicMetaDataBlock >> isMetaData [
+	^ true
 ]
 
 { #category : 'markups' }

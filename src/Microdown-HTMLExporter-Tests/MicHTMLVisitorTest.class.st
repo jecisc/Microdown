@@ -81,11 +81,12 @@ MicHTMLVisitorTest >> testConfiguration [
 ]
 
 { #category : 'tests' }
-MicHTMLVisitorTest >> testContents [ 
+MicHTMLVisitorTest >> testContents [
 
 	self assert: writer contents equals: String empty.
-	writer visitItalic: (MicItalicFormatBlock new textElement: (MicTextBlock new substring: 'test')).
-	self assert: writer contents equals: '<i>test</i>'.
+	writer visitItalic: (MicItalicFormatBlock new children:
+			 { (MicTextBlock new bodyString: 'test') }).
+	self assert: writer contents equals: '<i>test</i>'
 ]
 
 { #category : 'tests' }
@@ -146,14 +147,18 @@ MicHTMLVisitorTest >> testCreateAnchorWithLink [
 MicHTMLVisitorTest >> testCreateAnnotationCompound [
 
 	| result |
-	
 	result := writer convertMicString: '# This is a title
-!!LabelOfAnnotatedBlock Body of annotated block
+>[!note]
+> Body of annotated block
+
 
 this is another string'.
-	self assert: result trimBoth equals: '<h1>This is a title</h1>', newLine ,
-'<section id="LabelOfAnnotatedBlock"><label for="LabelOfAnnotatedBlock">Body of annotated block</label></section>', newLine ,
-'<p>this is another string</p>'.
+	self
+		assert: result trimBoth
+		equals: '<h1>This is a title</h1>' , newLine
+			,
+			'<q id="note">Body of annotated block</q>'
+			, newLine , '<p>this is another string</p>'
 ]
 
 { #category : 'tests' }
@@ -161,10 +166,14 @@ MicHTMLVisitorTest >> testCreateAnnotationSimple [
 
 	| result |
 	self assert: writer contents equals: String empty.
-	
-	result := writer convertMicString: '!!LabelOfAnnotatedBlock Body of annotated block'.
-	self assert: result trimBoth equals: '<section id="LabelOfAnnotatedBlock"><label for="LabelOfAnnotatedBlock">Body of annotated block</label></section>'.	
 
+	result := writer convertMicString:
+		          '>[!note]
+> Body of annotated block'.
+	self
+		assert: result trimBoth
+		equals:
+		'<q id="note">Body of annotated block</q>'
 ]
 
 { #category : 'tests' }

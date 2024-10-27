@@ -26,7 +26,7 @@ Class {
 		'parserClass'
 	],
 	#pools : [
-		'MicMicrodownSharedPool'
+		'MicSharedPool'
 	],
 	#category : 'Microdown-Tests-Snippets',
 	#package : 'Microdown-Tests',
@@ -49,6 +49,13 @@ MicMicrodownSnippetFactory class >> buildDocument [
 						  stream
 							  cr;
 							  << (factory perform: elementTypeSelector) ] ] ]
+]
+
+{ #category : 'utilities' }
+MicMicrodownSnippetFactory class >> protocolNames [
+	"Return the list of all the protocol names included in this class."
+
+	^ self protocols collect: [ :protocol | protocol name ]
 ]
 
 { #category : 'anchor' }
@@ -80,8 +87,8 @@ MicMicrodownSnippetFactory >> anchorWithSpaceInsideSample [
 
 { #category : 'anchor' }
 MicMicrodownSnippetFactory >> annotatedSample [
-	^ '!!label 
-Foo _bar_
+	^ '>[!label]
+> Foo _bar_
 '
 ]
 

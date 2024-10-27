@@ -8,7 +8,7 @@ Class {
 		'parser'
 	],
 	#pools : [
-		'MicroSharedPool'
+		'MicSharedPool'
 	],
 	#category : 'Microdown-PrettyPrinter-Tests',
 	#package : 'Microdown-PrettyPrinter-Tests'
@@ -39,7 +39,7 @@ MicTextualMicrodownExporterTest >> setUp [
 	parser := Microdown new
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testAnchor [
 
 	| micAnchor |
@@ -47,13 +47,13 @@ MicTextualMicrodownExporterTest >> testAnchor [
 	self assert: (visitor visit: micAnchor) first asString equals: AnchorMarkup
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testAnchorAutomatic [
 
 	self verifyObtain: factory anchorSample
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testAnchorReference [
 	"Pay attention an anchor reference is inside a paragraph and a paragraph emits 
 	a newline "
@@ -66,25 +66,30 @@ MicTextualMicrodownExporterTest >> testAnchorReference [
 	
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testAnnotated [
 
-	self verifyObtain: factory annotatedSample
+	| mic |
+	mic := parser parse: factory annotatedSample.
+	self assert: (mic accept: visitor) contents equals: '>[!note]
+> label Foo _bar_
+
+'
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testAnnotation [
 
 	self verifyObtain: factory annotationSample
 ]
 
-{ #category : 'tests-codeblock' }
+{ #category : 'tests - codeblock' }
 MicTextualMicrodownExporterTest >> testCodeBlock [
 
 	self verifyObtain: factory blockWithParametersSample, String cr
 ]
 
-{ #category : 'tests-codeblock' }
+{ #category : 'tests - codeblock' }
 MicTextualMicrodownExporterTest >> testCodeBlockNewLine [
 
 	| mic |
@@ -98,13 +103,13 @@ this is a codeblock
 '
 ]
 
-{ #category : 'tests-codeblock' }
+{ #category : 'tests - codeblock' }
 MicTextualMicrodownExporterTest >> testCodeBlockWithCaption [
 
 	self verifyObtain: factory blockWithParametersWithCaptionSample, String cr
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testComment [
 
 	self verifyObtain: factory commentSample
@@ -191,7 +196,7 @@ MicTextualMicrodownExporterTest >> testFileFigure [
 	self verifyObtain: factory fileFigureSample
 ]
 
-{ #category : 'tests-header' }
+{ #category : 'tests - header' }
 MicTextualMicrodownExporterTest >> testHeaderNewLine [
 
 	| mic |
@@ -204,13 +209,13 @@ MicTextualMicrodownExporterTest >> testHeaderNewLine [
 '
 ]
 
-{ #category : 'tests-header' }
+{ #category : 'tests - header' }
 MicTextualMicrodownExporterTest >> testHeaderWithBold [
 	
 	self verifyObtain: factory headerWithFormatSampleWithNewLine
 ]
 
-{ #category : 'tests-header' }
+{ #category : 'tests - header' }
 MicTextualMicrodownExporterTest >> testHeaderWithMicroDownMarkup [
 
 	| mic |
@@ -221,25 +226,29 @@ MicTextualMicrodownExporterTest >> testHeaderWithMicroDownMarkup [
 '
 ]
 
-{ #category : 'tests-header' }
+{ #category : 'tests - header' }
 MicTextualMicrodownExporterTest >> testHeaderWithNestedFormatSampleWithNewLine [
 	
 	self verifyObtain: factory headerWithNestedFormatSampleWithNewLine.
 
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testHorizontalLine [
 
 	self verifyObtain: factory horizontalLineSample
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testInputfile [
 
 	| inputFile |
+	
 	inputFile := parser parse: factory inputfileSample.
-	self assert: inputFile children first path path equals: 'Chapters/text.md'
+	self
+		assert: (inputFile accept: visitor) contents
+		equals: '
+<!inputFile|path=Chapters/text.md!>'
 ]
 
 { #category : 'tests - link' }
@@ -307,16 +316,25 @@ MicTextualMicrodownExporterTest >> testMathInline [
 	self verifyObtain: factory mathInlineSample
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testMetaData [
-	self skip.
-	self flag: #fixme.
-	"the builder wait a collection of associotion or a dictionnary but a metaData has not that"
 
-	self verifyObtain: factory metaDataSample
+	| newDocument |
+	newDocument := parser parse: factory metaDataSample.
+	visitor visit: newDocument.
+
+	self assert: (visitor contents includesSubstring: '"title" : "The title"').
+
+	"should revisit newline"
+	self 
+		assert: visitor contents 
+		equals: '{
+"author" : "G. Foo",
+"title" : "The title"
+}'
 ]
 
-{ #category : 'tests-header' }
+{ #category : 'tests - header' }
 MicTextualMicrodownExporterTest >> testNestedHeader [
 
 	| header res |
@@ -406,7 +424,7 @@ MicTextualMicrodownExporterTest >> testParagraphWithItalic [
 MicTextualMicrodownExporterTest >> testParagraphWithMicroDownMarkup [
 
 	| mic |
-	mic := parser parse: 'blab\~l\**a*1'.
+	mic := parser parse: 'blab\~l\*\*a*1'.
 	self assert: (mic accept: visitor) contents equals: '
 blab\~l\**a*1
 '
@@ -430,25 +448,25 @@ MicTextualMicrodownExporterTest >> testParagraphWithStrike [
 	self verifyObtain: factory paragraphStrikeSample
 ]
 
-{ #category : 'tests-header' }
+{ #category : 'tests - header' }
 MicTextualMicrodownExporterTest >> testPlainHeader [
 
 	self verifyObtain: factory headerLevel3SampleWithNewLine 
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testQuote [
 
 	self verifyObtain: factory quoteSample
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testRawFormat [
 
 	self verifyObtain: factory rawFormatSample
 ]
 
-{ #category : 'tests-anchor' }
+{ #category : 'tests - anchor' }
 MicTextualMicrodownExporterTest >> testRoot [
 
 	self verifyObtain: factory rootSample

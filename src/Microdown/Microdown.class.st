@@ -1,8 +1,7 @@
 "
-I'm the favored entry point to use microdown. I'm a kind of facade to steer Microdown services.
+I'm the favored entry point to use Microdown. I'm a kind of facade to steer Microdown services.
 
-
-In particular I invoke a resolver for paths after parsing documents .
+In particular, I invoke a resolver for paths after parsing documents.
 
 <!inputFile|path=pharo:///Microdown/facadeMethods!>
 "
@@ -118,6 +117,12 @@ Microdown class >> parse: aStreamOrString [
 ]
 
 { #category : 'facade' }
+Microdown class >> parseFile: aFile [
+
+	^ self new parseFile: aFile
+]
+
+{ #category : 'facade' }
 Microdown class >> resolveDocument: document withBase: base [
 	"resolve all relative urls in document with respect to the absolute uri 
 	base can be a aString | aZnUrl | absoluteResourceReference"
@@ -144,6 +149,16 @@ Microdown >> builder [
 Microdown >> parse: aStreamOrString [
 
 	^ MicrodownParser parse: aStreamOrString
+]
+
+{ #category : 'facade' }
+Microdown >> parseFile: aFile [
+		
+		|root|
+		root := MicrodownParser parse: aFile contents. 
+		root fromFile: aFile.
+		^ root
+		
 ]
 
 { #category : 'facade' }

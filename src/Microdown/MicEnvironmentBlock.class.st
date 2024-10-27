@@ -1,10 +1,13 @@
 "
-An environment is delimited by a start and end markup and it can have an argument list. 
-By default I do not handle any form of formatting in the potential arguments.
+An environment is delimited by a start and end markup, and it can have an argument list. 
+By default, I do not handle any form of formatting in the arguments.
 
 ## Syntax
 
+% Examples do not work (as of 06/23), it would be nice to show one.
+
 ```text
+
 <!aTypeOfEnvironment|argument=value&argument2=value2
 ...
 !>
@@ -13,14 +16,13 @@ Here is an example of a slide (subclass of `MicEnvironmentBlock`)
 
 ```text
 <!slide|title=This is a cool title&tag=nh5p
-
-- a list of bullet
+- a list of bullets
 - bullet 2
 - bullet 3
 !>
 ```
 
-This is important to support better column in the future:
+This is important for better column support in the future:
 
 ```text
 <!slide|title=Class Methods!>
@@ -34,13 +36,11 @@ This is important to support better column in the future:
 
 <!column|width=40!>
 
-- press the button ==class== to define a class method
+- press the ==class== button to define a class method
 - in lectures, we add ==class==
 !>
 !>
 ```
-
-
 "
 Class {
 	#name : 'MicEnvironmentBlock',
@@ -73,9 +73,9 @@ MicEnvironmentBlock class >> addDocumentDefinedEnvironments: aBuilder [
 { #category : 'public' }
 MicEnvironmentBlock class >> alternateBlockClassFor: line [
 
-	"If there is one subclass with the corresponding tag, returns it, else resturn the current class."
+	"If there is one subclass with the corresponding tag, returns it, else return the current class."
 	"line is of the form <!slide|title=Schedule"
-	"We know that the two first characters are <? else we would be invoked"
+	"We know that the two first characters are <! else we would not be invoked"
 
 	| tag |
 	tag := ((line allButFirst: EnvironmentOpeningBlockMarkup size) 
@@ -174,6 +174,14 @@ MicEnvironmentBlock >> extractFirstLineFrom: aLine [
 			isClosed := true.
 			extract trimRight ]
 		ifFalse: [ firstLine ]
+]
+
+{ #category : 'parse support' }
+MicEnvironmentBlock >> initialize [
+
+	super initialize.
+	arguments := MicArgumentList new 
+		
 ]
 
 { #category : 'markups' }

@@ -1,8 +1,8 @@
 "
-I am a code block. I look like this, starting and ending with three $`
-my 'arguments' is just the text from the fourth character up to the end of line.
+I am a code block. I look like this, starting and ending with three `$`` (backticks).
+My 'arguments' variable is the text starting from the fourth character to the end of the line.
 
-```
+```text
  ```arguments
  line 1
  line 2
@@ -10,20 +10,19 @@ my 'arguments' is just the text from the fourth character up to the end of line.
  ``` 
 ```
 
-A codeblock does not interpreter its contents. 
-You can however specify different tag and multiple argument. 
+A codeblock does not interpret its contents. 
+However, you can specify different tags, such as an anchor and a caption. 
 
+```text
+ ```language=pharo|caption=A method&anchor=method 
+ pharoMotto 
+ ^ 'Doing something every day is the best way to make progress'
+ ```
 ```
-	```language=pharo|caption=A method&label=method 
-	pharoMotto 
-		^ 'Doing something every is the best way to make progress'
-	```
-```
 
+For now we do not support the use of multiple backticks. The markup is only 3 backticks. If you want to nest codeblocks within codeblocks, you must use an extra space. 
 
-For now we do not support the use of multiple backticks. The markup is only 3 backticks. If you want to embed codeblock inside codeblock you must use an extra space. 
-
-```
+```text
  ```
   ```
   A nested codeblock
@@ -31,9 +30,9 @@ For now we do not support the use of multiple backticks. The markup is only 3 ba
  ```
 ```
 
-#### Implementation thoughts
-The current implementation stores lines in a single text and this is a bad idea because first what if the user use lf in his text!
-Second if we want to treat lines separatedly we have to reparse it. Now we do not need it so this is good but this is just by chance!
+#### Implementation Thoughts
+The current implementation stores lines in a single text and this is a bad idea because first what if the user uses `lf`/`cr` in his text!
+Second if we want to treat lines separately, we have to reparse them. Now we do not need it so this is good but this is just by chance!
 "
 Class {
 	#name : 'MicCodeBlock',
@@ -46,6 +45,28 @@ Class {
 { #category : 'visiting' }
 MicCodeBlock >> accept: aVisitor [
  	^ aVisitor visitCode: self
+]
+
+{ #category : 'accessing' }
+MicCodeBlock >> anchor [
+	| anchor |
+	anchor := self arguments 
+		at: #anchor 
+		ifAbsent: [ nil ].
+	anchor ifNil: [ anchor := self arguments at: #label ifAbsent: [ nil ] ].
+	^ anchor 
+]
+
+{ #category : 'accessing' }
+MicCodeBlock >> anchor: aString [
+
+	self arguments at: #anchor put: aString
+]
+
+{ #category : 'accessing' }
+MicCodeBlock >> anchorLabel [
+	"This should only be invoked when checking references"
+	^ self anchor
 ]
 
 { #category : 'public' }
@@ -81,6 +102,12 @@ MicCodeBlock >> extractFirstLineFrom: aLine [
 	^ lineWithoutMarkup
 ]
 
+{ #category : 'accessing' }
+MicCodeBlock >> hasAnchor [
+	^ (arguments includesKey: #label) or: [ arguments includesKey: #anchor ]
+
+]
+
 { #category : 'testing' }
 MicCodeBlock >> hasBody [
 
@@ -89,8 +116,12 @@ MicCodeBlock >> hasBody [
 
 { #category : 'accessing' }
 MicCodeBlock >> hasLabel [
-	^ arguments includesKey: #label
 
+	self
+		deprecated: 'Use hasAnchor'
+		transformWith: '`@rec hasLabel' -> '`@rec hasAnchor'.
+
+	^ self hasAnchor
 ]
 
 { #category : 'testing' }
@@ -113,20 +144,34 @@ MicCodeBlock >> initialize [
 
 { #category : 'accessing' }
 MicCodeBlock >> label [
-	"precondition: receiver hasLabel"
+	self deprecated: 'Use anchor' transformWith: '`@rec label' -> '`@rec anchor'.
 	
-	^ arguments at: #label
+	^ self anchor
 ]
 
 { #category : 'accessing' }
 MicCodeBlock >> label: aString [
 
-	self arguments at: #label put: aString
+	self deprecated: 'Use anchor:' transformWith: '`@rec label: `@args' -> '`@rec anchor: `@args'.
+	self anchor: aString
+]
+
+{ #category : 'accessing' }
+MicCodeBlock >> mainExtensionTag [
+	"return the main tag beside the language"
+	
+	"The point by default we always have language -> pharo
+	so when the user did not add any other bindings, then the mainExtensionTag will be language
+	so that we do not have to check and use a NullStrategy"
+	| k |
+	k := arguments keys.
+	^ k size = 1
+		ifTrue: [ k first ]
+		ifFalse: [ k second ]
 ]
 
 { #category : 'accessing' }
 MicCodeBlock >> size [
-
 	"precondition: receiver hasLabel"
 
 	^ arguments at: #size

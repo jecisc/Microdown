@@ -55,7 +55,7 @@ MicDumperTest >> testBoldFormat [
 	| micBold |
 	micBold := (parser parse: factory boldFormatSample) children first
 		           children first.
-	self assert: micBold children first class equals: MicTextBlock.
+	self assert: micBold children first class equals: MicTextBlock. 
 	visitor visit: micBold.
 	self
 		assert: visitor contents
@@ -207,7 +207,7 @@ MicDumperTest >> testCodeBlockWithSpacedParameters [
 	self
 		assert: result contents
 		equals:
-		'(MicCodeBlock new arguments: { #foo -> true  . #bar -> 2 } asDictionary ; body: ''bla'')'
+		'(MicCodeBlock new arguments: { #foo ->true . #bar ->2 } asDictionary ; body: ''bla'')'
 ]
 
 { #category : 'test - inline - blocks' }
@@ -529,7 +529,7 @@ MicDumperTest >> testQuote [
 	self
 		assert: visitor contents
 		equals:
-		'(MicQuoteBlock new textElement: (MicTextBlock new substring: ''Foo''))'
+		'(MicBlockQuoteBlock new textElement: (MicTextBlock new substring: ''Foo''))'
 ]
 
 { #category : 'test - inline - blocks' }

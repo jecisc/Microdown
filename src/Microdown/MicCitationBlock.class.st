@@ -1,11 +1,10 @@
 "
-A citation is an inline element that represents a bibliography reference as in LaTeX for example.
+A citation is an inline element that represents a bibliography reference, such as in LaTeX.
 The bibliography will be able to extract its entries from the reference in the citation.
 
-```
+```language=text
 this is a text with a {!citation|ref=Duca99a!}
 ```
-
 "
 Class {
 	#name : 'MicCitationBlock',
@@ -14,6 +13,13 @@ Class {
 	#package : 'Microdown',
 	#tag : 'Extensions'
 }
+
+{ #category : 'accessing' }
+MicCitationBlock class >> key [
+	"The key for citation|ref=Value is ref"
+	
+	^ 'ref'
+]
 
 { #category : 'accessing' }
 MicCitationBlock class >> tag [

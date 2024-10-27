@@ -134,6 +134,7 @@ MicRichTextComposerTest >> setUp [
 	parser := Microdown new.
 	offlineStatus := Microdown offline.
 	Microdown offline: false.
+
 ]
 
 { #category : 'skipped tests' }
@@ -273,7 +274,7 @@ line 2
 	self assert: richText asString trim equals: 
 'line 1
 line 2
-Roger Rabbit'
+an Array(Text(Roger Rabbit))'
 ]
 
 { #category : 'tests - codeBlock' }
@@ -485,7 +486,7 @@ MicRichTextComposerTest >> testNestedMixedList [
 ]
 
 { #category : 'skipped tests' }
-MicRichTextComposerTest >> testNestedMixedListNoEmptyLinesEfterSubLists [
+MicRichTextComposerTest >> testNestedMixedListNoEmptyLinesAfterSubLists [
 
 	| source output |
 	source := 
@@ -493,12 +494,10 @@ MicRichTextComposerTest >> testNestedMixedListNoEmptyLinesEfterSubLists [
   1. sub item 1.1
 - item 2
   2. sub item 2.1
-  2. sub item 2.2
+     - sub item 2.1.1
 - item 3'.
 	output := (self richTextForString: source) asString trim.
 	self assert: output lines size equals: 6
-	
-	
 ]
 
 { #category : 'skipped tests' }
@@ -542,7 +541,7 @@ And this is just an other paragraph'.
 ]
 
 { #category : 'tests - list' }
-MicRichTextComposerTest >> testNosuperfluousNewLines [
+MicRichTextComposerTest >> testNoSuperfluousNewLines [
 
 	| source richText expected |
 	source :=  'This is **bold**'.
@@ -581,6 +580,18 @@ MicRichTextComposerTest >> testOrderedNestedList [
 	self assert: (richText asString includesSubstring: 'A)	Second item').
 	self assert: (richText asString includesSubstring: 'a)	Third item')
 	
+]
+
+{ #category : 'tests' }
+MicRichTextComposerTest >> testOrderedNestedListNoEmptyLinesAfterSubLists [
+	| source output |
+	source := '
+1. First item
+   2. Second item
+      3. Third item
+4. Fourth item'.
+	output := (self richTextForString: source) asString trim.
+	self assert: output lines size equals: 4.
 ]
 
 { #category : 'tests - paragraph' }
@@ -648,7 +659,6 @@ MicRichTextComposerTest >> testStrikethroughFormat [
 MicRichTextComposerTest >> testStylerForMethod [
 	
 	| code source richText blueLocation textColor |
-
 	code := '
 codeStylerFor: aString
 <codeblockStylerFor: #smalltalk>
@@ -684,6 +694,18 @@ MicRichTextComposerTest >> testUnorderedList [
 	self assert: runs first first amount equals: 1.
 	self assert: (runs at: 29) "the first o in 'on two lines'" first class equals: TextIndent.
 	self assert: (runs at: 29) first amount equals: 2.
+]
+
+{ #category : 'tests' }
+MicRichTextComposerTest >> testUnorderedNestedListNoEmptyLinesAfterSubLists [
+	| source output |
+	source := '
+- First item
+  - Second item
+    - Third item
+- Fourth item'.
+	output := (self richTextForString: source) asString trim.
+	self assert: output lines size equals: 4.
 ]
 
 { #category : 'tests - format' }

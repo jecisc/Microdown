@@ -4,24 +4,22 @@
 I'm a parser for Microdown, implemented by S. Ducasse, L. Dargaud and G. Polito (2020). 
 It is based on K. Osterbye's work on GitHubMarkdown. 
 
-Microdown covers Markdown basis syntax, with great Pillar's features. It's more extensible too.
+Microdown covers the basic syntax of Markdown, with great Pillar features. It's also more extensible.
 
 ## MicroDown Syntax in a Nutshell!
-
+ 
 **Headers** (up to 6 levels) >>>> `# Header level 1`
 
 **Unordered list**
-```
+```text
 - item a
   on another line
 - item b
-   - item b1
+   - item b1 haaaaaaaaaa
    - item b2
 - item c
 ```
-
-produces
-
+Produces:
 - item a
   on another line
 - item b
@@ -30,89 +28,105 @@ produces
 - item c
 
 **Ordered list**
-```
+```text
 1. item one
    1. subitem
 2. item two
 ```
-produces 
-
+Produces:
 1. item one
    1. subitem
 2. item two
 
 
 **Codeblock with arguments**
-```
+```text
  ```language=Pharo&caption=Beautiful&label=Fig1
  some piece of code
  ```
 ```
-
-produces 
-
+Produces:
 ```language=Pharo&caption=Beautiful&label=Fig1
 some piece of code
 ```
 
-**Anchor and its reference** >>>> `\@anchor` and its reference in text with `\*@anchor@*`
+**Anchor and its reference** >>>> `@anchor` and its reference in text with `*@anchor@*`
 
 **Math environment** (rendered with LaTex in Pharo)
-- inline: $\cos(\theta_i+C_3)$ >>>> `\$\cos(\theta_i+C_3)$`
-- block: 
+- inline: $\cos(\theta_i+C_3)$ >>>> `$\cos(\theta_i+C_3)$`
+- block:
+```text
+$$
+\cos(\theta_i+C_3)
+$$
 ```
- $
- \cos(\theta_i+C_3)
- $
-```
+$$
+\cos(\theta_i+C_3)
+$$
+ 
 **Annotated paragraph**
-``` 
- !!note Then you can write your note
- on several lines, like a normal paragraph
+```text
+!!note Then you can write your note
+on several lines, like a normal paragraph
 ```
+
 **Quote** to indent some lines
-```
+```text
 > This is
 > A nice quote
 ```
+
 **Environment** (called Annotation for inline)
 - inline: `\<?keyword|key1=value1&key2=value2?>`
 - block: 
+```text
+<?keyword|key1=value1&key2=value2
+type your content
+?>
 ```
- <?keyword|key1=value1&key2=value2
- type your content
- ?>
-```
+
 **Metadata** as a block
+```text
+{ 
+type your metadata
+}
 ```
- { 
- type your metadata
- }
+
+**Table**
+Support for tables with a simpler and more relaxed setup than GitHub.
+A table is not forced to have a header definition.
+
+```text
+| aaa | bbb
+| ccc | ddd
 ```
+Produces:
+| aaa | bbb
+| ccc | ddd
 
-**Table** **@tocomment**
-
-**Horizontal line** >>> `***` alone on a line will define a separator in your text **@todo**
-
-**Comments** don't appear after parsing >>> `% A commented line`
+**Horizontal line** >>>> `***` alone on a line will define a separator in your text.
+***
+ 
+**Comments** don't appear after parsing >>>> `% A commented line`
+% This can only be read in the original source, as you are doing.
 
 **Inline formats**
 - **bold** >>>> `**bold**`
-- _italic_ >>>> `\_italic_`
+- _italic_ >>>> `_italic_`
 - `monospace` aka inline code >>>> `\`monospace\``
 
-_Note: inline escape character is back slash: \\ ._
+_Note: inline escape character is the backslash: `\\`._
 _Note: text in monospace is analyzed for you to generate hypertext Pharo code objects! Isn't it so cool to write a great doc? It is! Click on them!_
 - `Point` for classes
 - `Point class` for class side
 - `Point>>#setX:setY:` for methods
 - `#'Microdown-Tests'` for packages
 
-**Raw** for your other code (inline) >>>> `\{{ some code }}`
+**Raw** for your other code (inline) >>>> `{{ some code }}`
 
-**Link** >>>> `\[link's name](url|key1=value1&key2=value2)`
+**Link** >>>> `[link's name](url|key1=value1&key2=value2)`
 
-**Figure** >>>> `\!\[figure's name](url|key1=value1&key2=value2)`
+**Figure** >>>> `![figure's name](url|key1=value1&key2=value2)`
 
 `![Pharo logo](https://files.pharo.org/media/logo/logo.png)`
 produces
@@ -120,24 +134,24 @@ produces
 ![Pharo logo](https://files.pharo.org/media/logo/logo.png)
 
 
-## Implementation
+## Implementation Notes
 
-I follow the design mentioned in [https://github.github.com/gfm](https://github.github.com/gfm), in particular the parsing strategy in appendix A.
+I follow the design mentioned in [https://github.github.com/gfm](https://github.github.com/gfm), in particular the parsing strategy in the appendix.
 
-In short, the strategy is that at any point in time, we might have a number of children of the root which are ""open"". The deepest in open in the tree is called ""current"". All the parents of current are open. 
+In short, the strategy is that at any point in time, we can have a number of children of the root that are ""open"". The deepest in open in the tree is called ""current"". All the parents of current are open. 
 
-When a new line is read we do the following:
+When a new line is read, we do the following:
 
 1. Check if the new line can be consumed by current.
-   - as part of this, a child of current can be made which can consume the new line. for example when consuming \`\`\` the root block node will create, a new code block that will become current and consume the body of the \`\`\` element then close. 
+   - as part of this, a child of current can be made which can consume the new line. For example, when consuming `\`\`\``, the root block node will create a new code block that will become current and consume the body of the `\`\`\`` element, then close. 
 2. If current cannot consume the new line, we close current, move current to its parent, and repeat 1.
-3. The root node can consume anything, for instance by making new nodes for storing the new line.
+3. The root node can consume anything, for instance by making new nodes to store the new line.
 4. The root node is not closed until input is exhausted.
 
-I do not accept lazy definition. I do not accept three different ways to do the same. Except for bulleted list where `*` and `-` are accepted. 
+I do not accept lazy definition. I do not accept three different ways to do the same thing. Except for bulleted lists, where `*` and `-` are accepted. 
 
 The spec says:
-```
+```text
 -> document
   -> block_quote
        paragraph
@@ -150,8 +164,7 @@ The spec says:
         -> paragraph
              ""aliquando id""
 ```
-Now the implementation for now does not create a paragraph in the list_item element. 
-
+The current implementation does not create a paragraph in the list_item element. 
 "
 Class {
 	#name : 'MicrodownParser',
@@ -162,7 +175,7 @@ Class {
 		'dispatchTable'
 	],
 	#pools : [
-		'MicMicrodownSharedPool'
+		'MicSharedPool'
 	],
 	#category : 'Microdown-Parser',
 	#package : 'Microdown',
@@ -177,6 +190,7 @@ MicrodownParser class >> builder [
 { #category : 'examples' }
 MicrodownParser class >> example [
 	<sampleInstance>
+	
 	^ self parse: self comment
 ]
 
@@ -189,20 +203,32 @@ MicrodownParser class >> parse: aString [
 { #category : 'node creation' }
 MicrodownParser >> blockStarterClassFrom: line [
 	"return the class of a block which can start with line, or nil if none"
-
+	
 	line ifEmpty: [ ^ nil ].
 	(self matchOrdered: line)
 		ifTrue: [ ^ self orderedListBlockClass ]
 		ifFalse: [
+			"right now this is super ugly and slow 
+			but this is to try. Once we understand and probably change the environment syntax for now it is <!
+			and this conflict with <!-- obviously. Too bad!
+			we will be able to make this huge hack goes away."
+			(line first = $< and: [ 
+					(ThreeLettersHTMLTags includes: (line allButFirst truncateTo: 3)) ])
+				ifTrue: [ 
+					"we have a rawparagraph block" 
+					^ MicRawParagraphBlock 
+					]
+				ifFalse: [ 
+								
 			"the max significant length of a markup is 3"
-			(3 to: 1 by: -1) do: [:i | | prefix |
+			(3 to: 1 by: -1) do: [:i | | prefix |			
 				prefix := (line truncateTo: i).
 				"If we have a inline starter, it takes precedence"
 				(Delimiters includes: prefix) 
 					ifTrue: [ ^ self delimiterBlockClassFor: prefix ].
   				dispatchTable
     		 		at: prefix
-      				ifPresent: [ :blockClass | ^ blockClass ] ] ].
+      				ifPresent: [ :blockClass | ^ blockClass ] ] ] ].
 	
 	^ self nonMatchedBlockClassFor: line
 ]
@@ -250,7 +276,8 @@ MicrodownParser >> initialize [
 	dispatchTable at: AnchorMarkup put: MicAnchorBlock.
 	dispatchTable at: HeaderMarkup put: MicHeaderBlock.
 	dispatchTable at: CodeblockMarkup put: MicAbstractCodeBlock.
-	dispatchTable at: AnnotatedParagraphMarkup put: MicAnnotatedBlock.
+	dispatchTable at: AnnotatedParagraphOpeningMarkup put: MicAnnotatedParagraphBlock.
+	dispatchTable at: AnnotatedParagraphBackwardCompatibleMarkup put: MicAnnotatedParagraphBlock.
 	dispatchTable at: CommentedLineMarkup put: MicCommentBlock.
 	dispatchTable at: HorizontalLineMarkup put: MicHorizontalLineBlock.
 	dispatchTable at: MathOpeningBlockMarkup put: MicMathBlock.
@@ -259,7 +286,7 @@ MicrodownParser >> initialize [
 	dispatchTable at: UnorderedListPlusMarkup put: MicUnorderedListBlock.
 	dispatchTable at: UnorderedListMarkup put: MicUnorderedListBlock.
 	dispatchTable at: UnorderedListStarMarkup put: MicUnorderedListBlock.
-	dispatchTable at: PreformattedMarkup put: MicQuoteBlock.
+	dispatchTable at: PreformattedMarkup put: MicBlockQuoteBlock.
 	dispatchTable at: TableCellMarkup put: MicTableBlock.
 ]
 
@@ -324,6 +351,10 @@ MicrodownParser >> parse: aStreamOrString [
 		whileFalse: [ 
 			current closeMe.
 			current := current parent ].
+	root hasMetaDataElement 
+		ifTrue: [ root properties: root metaDataElement body ].
+			
+		
 	^ root
 ]
 

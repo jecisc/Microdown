@@ -1,78 +1,88 @@
 "
-I represent an annotation delimted by `{!` and `!}`: a tag with parameters.
+I represent an annotation, a tag with parameters, delimited by `{!` and `!}`.
+I'm composed of a tag and a list of valued keys following the syntax `tag|key1=value1&key2=value2`
 
-The following is a citation annotation with as parameters the name variable bound to the string 'Duca99a'.
+The following example is a citation annotation with the name variable bound to the string 'Duca99a' as a parameter.
 
 ```text
-{!citation|name=Duca99a!}
+{!citation|ref=Duca99a!}
 ```
 
 ```
-MicroDownParser parse: '{!citation|name=Duca99a!}'
+MicrodownParser parse: '{!citation|ref=Duca99a!}'
+```
+
+Note that the first key (that should be defined on the class side via the key method) can be omitted.
+So 
+
+```text
+{!citation|ref=Duca99a!}
+```
+
+is equivalent to 
+
+```text
+{!citation|Duca99a!}
 ```
 "
 Class {
 	#name : 'MicAnnotationBlock',
-	#superclass : 'MicInlineElement',
+	#superclass : 'MicUnEvaluatedBlock',
 	#instVars : [
 		'arguments'
 	],
-	#category : 'Microdown-ModelInline',
+	#category : 'Microdown-Model',
 	#package : 'Microdown',
-	#tag : 'ModelInline'
+	#tag : 'Model'
 }
 
-{ #category : 'documentation' }
-MicAnnotationBlock class >> addDocumentDefinedAnnotations: aBuilder [
-	| currentDefinedTags |
-	currentDefinedTags := self allSubclasses collect: [ :subclass | subclass tag -> subclass name].
-	aBuilder newLine.
-	aBuilder header: [ aBuilder text: 'Defined annotations' ] withLevel: 2.
-	aBuilder unorderedListDuring: [ 
-		currentDefinedTags do: [:tagAndClass | 
-	
-			aBuilder item: [ 
-				aBuilder 
-					bold: [aBuilder text: tagAndClass key];
-					text: ' defined by ';
-					monospace: tagAndClass value
-					]]
-		 ]
+{ #category : 'accessing' }
+MicAnnotationBlock class >> closingDelimiter [
+
+ 	^ AnnotationCloserMarkup
 ]
 
-{ #category : 'documentation' }
-MicAnnotationBlock class >> buildMicroDownUsing: aBuilder withComment: aString [
-	
-	super buildMicroDownUsing: aBuilder withComment: aString.
-	self addDocumentDefinedAnnotations: aBuilder
-]
+{ #category : 'parsing' }
+MicAnnotationBlock class >> key [
 
-{ #category : 'constructor' }
-MicAnnotationBlock class >> from: aStartInteger to: anEndInteger withSubstring: aString withChildren: aChildren [
-
-	| splitter tag extensionClass |
-	splitter := MicArgumentList
-		            split: aString
-		            defaultArg: #annotationKind
-		            defaultValue: 'Me'.
-	tag := splitter defaultValue trimBoth.
-
-	extensionClass := self extensionClassFor: tag.
-
-	^ extensionClass new
-		  start: aStartInteger;
-		  end: anEndInteger;
-		  substring: aString;
-		  children: aChildren;
-		  arguments: splitter;
-		  closeMe;
-		  cleanSubstring;
-		  yourself
+	^ 'key'
 ]
 
 { #category : 'accessing' }
+MicAnnotationBlock class >> openingDelimiter [
+
+ 	^ AnnotationOpenerMarkup
+]
+
+{ #category : 'parsing' }
+MicAnnotationBlock class >> parse: delimiter stream: aTokenStream for: aParser [
+
+	| bodystring arguments tag extensionClass |
+	bodystring := delimiter undelimitedSubstring.
+	arguments := MicArgumentList
+		             split: bodystring
+		             defaultArg: #annotationKind
+		             defaultValue: 'Me'.
+	tag := arguments defaultValue trimBoth.
+
+	extensionClass := self extensionClassFor: tag.
+	
+	arguments justTheArguments ifNotEmpty: [ | key |
+		key := arguments justTheArguments keyAtIndex: 1.
+	(arguments at: key) ifNil: [ arguments at: extensionClass key put: key ]]. 
+	
+	
+	
+	^ extensionClass new
+		  bodyString: bodystring;
+		  arguments: arguments
+]
+
+{ #category : 'parsing' }
 MicAnnotationBlock class >> tag [
-	^ #empty
+	"Return the identifier of annotation e.g. tag in tag|key=value"
+	
+	^ self subclassResponsibility 
 ]
 
 { #category : 'visiting' }
@@ -82,41 +92,17 @@ MicAnnotationBlock >> accept: aVisitor [
 
 { #category : 'accessing' }
 MicAnnotationBlock >> arguments [
+
 	^ arguments
 ]
 
 { #category : 'accessing' }
-MicAnnotationBlock >> arguments: anArguments [
-	arguments := anArguments
-]
+MicAnnotationBlock >> arguments: argumentList [
 
-{ #category : 'accessing' }
-MicAnnotationBlock >> closingDelimiter [
-
- 	^ AnnotationCloserMarkup
-]
-
-{ #category : 'accessing' }
-MicAnnotationBlock >> kind [
-
-	^ #annotation
+	arguments := argumentList
 ]
 
 { #category : 'accessing' }
 MicAnnotationBlock >> name [
 	^ arguments defaultValue
-]
-
-{ #category : 'accessing' }
-MicAnnotationBlock >> openingDelimiter [
-
- 	^ AnnotationOpenerMarkup
-]
-
-{ #category : 'accessing' }
-MicAnnotationBlock >> printOn: aStream [
-
-	aStream nextPutAll: self openingDelimiter.
-	aStream nextPutAll: self substring.
-	aStream nextPutAll: self closingDelimiter.
 ]

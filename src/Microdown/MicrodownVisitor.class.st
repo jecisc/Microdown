@@ -1,9 +1,6 @@
 "
-I'm an abstract visitor for Microdown document three. 
-By default I visit only the nodes of the domain: it means that I will not visit the label of an annotated paragraph 
-or the parameters of an annotation or the URL of a figure because such elements are not represented by subclasses 
-of MicElement.
-
+I'm an abstract visitor for Microdown document trees.
+By default, I only visit the nodes of the domain: it means that I will not visit the label of an annotated paragraph, or the parameters of an annotation, or the URL of an image, because such elements are not represented by subclasses of `MicElement`.
 "
 Class {
 	#name : 'MicrodownVisitor',
@@ -104,9 +101,8 @@ MicrodownVisitor >> visitEnvironment: anEnvironment [
 
 { #category : 'visiting - inline elements' }
 MicrodownVisitor >> visitFigure: aFigure [
-	
-	^ aFigure captionElements do: [:each | each accept: self ]
-		
+
+	^ aFigure children do: [ :each | each accept: self ]
 ]
 
 { #category : 'visiting' }
@@ -124,6 +120,10 @@ MicrodownVisitor >> visitHeader: aHeader [
 MicrodownVisitor >> visitHorizontalLine: anHorizontalLineBlock [
 ]
 
+{ #category : 'visiting - html extensions' }
+MicrodownVisitor >> visitInlineSpace: anInlineSpace [
+]
+
 { #category : 'visiting' }
 MicrodownVisitor >> visitInputFile: anInputfile [
 	"subclassResponsibility"
@@ -139,8 +139,7 @@ MicrodownVisitor >> visitItalic: aFormat [
 { #category : 'visiting - inline elements' }
 MicrodownVisitor >> visitLink: aLink [
 
-	^ aLink captionElements do: [:each | each accept: self ].
-
+	^ aLink children do: [ :each | each accept: self ]
 ]
 
 { #category : 'visiting - list' }
@@ -169,6 +168,10 @@ MicrodownVisitor >> visitMonospace: aFormat [
 
 	^ self visitChildrenOf: aFormat.
 
+]
+
+{ #category : 'visiting - inline elements' }
+MicrodownVisitor >> visitNote: aNote [
 ]
 
 { #category : 'visiting - list' }
@@ -209,6 +212,12 @@ MicrodownVisitor >> visitQuote: aQuote [
 MicrodownVisitor >> visitRaw: aRawFormat [
 
 	
+]
+
+{ #category : 'visiting - html extensions' }
+MicrodownVisitor >> visitRawParagraph: aRawParagraph [
+
+
 ]
 
 { #category : 'visiting' }

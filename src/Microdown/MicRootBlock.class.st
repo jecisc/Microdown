@@ -1,5 +1,5 @@
 "
-I am the root of the github markup tree
+I am the root of the markup tree.
 "
 Class {
 	#name : 'MicRootBlock',
@@ -33,8 +33,45 @@ MicRootBlock >> canConsumeLine: line [
 ]
 
 { #category : 'accessing' }
+MicRootBlock >> fromFile [
+	^ self propertyAt: #file ifAbsent: [ 'fakedFile' ]
+]
+
+{ #category : 'accessing' }
+MicRootBlock >> fromFile: aFileReference [ 
+	"Store the file from which the document was built"
+	
+	self propertyAt: #file put: (aFileReference ifNotNil: [aFileReference asFileReference])
+]
+
+{ #category : 'accessing' }
+MicRootBlock >> fromSource [
+	^ self   
+]
+
+{ #category : 'testing' }
+MicRootBlock >> hasFile [
+	^ self hasProperty: #file
+]
+
+{ #category : 'testing' }
+MicRootBlock >> hasMetaDataElement [
+	
+	^ children 
+		ifEmpty: [false]
+		ifNotEmpty: [ children first isMetaData ]
+]
+
+{ #category : 'accessing' }
 MicRootBlock >> indent [
 	^0
+]
+
+{ #category : 'testing' }
+MicRootBlock >> metaDataElement [
+	"if self hasMetaDataElement then metaDataElement returns it.
+	else it returns the first element."
+	^ children first
 ]
 
 { #category : 'accessing' }
@@ -54,6 +91,14 @@ MicRootBlock >> properties: aConfigurationForPillar [
 	store the dictionary values in it.
 	"
 	
-	properties keysAndValuesDo: [ :k :v | aConfigurationForPillar at: k put: v ].
+	self properties keysAndValuesDo: [ :k :v | aConfigurationForPillar at: k put: v ].
 	properties := aConfigurationForPillar
+]
+
+{ #category : 'accessing' }
+MicRootBlock >> resolveYourself [
+
+	MicZincPathResolver
+		resolve: self
+		withBase: self fromFile.
 ]

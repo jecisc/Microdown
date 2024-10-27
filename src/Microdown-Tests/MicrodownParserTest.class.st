@@ -5,7 +5,7 @@ Class {
 		'parser'
 	],
 	#pools : [
-		'MicMicrodownSharedPool'
+		'MicSharedPool'
 	],
 	#category : 'Microdown-Tests-Parser',
 	#package : 'Microdown-Tests',
@@ -44,11 +44,11 @@ MicrodownParserTest >> stestMathBlockWithArguments [
 { #category : 'tests - anchor' }
 MicrodownParserTest >> testAnchorBlock [
 	| source root annotated |
-	source := AnchorMarkup, 'label1'.
+	source := AnchorMarkup, 'label1' , String cr , AnchorMarkup , 'label2'.
 	root := parser parse: source.
-	self assert: root children size equals: 1.
-	annotated := root children first. 
-	self assert: annotated label equals: 'label1'.
+	self assert: root children size equals: 2.
+	annotated := root children at: 2. 
+	self assert: annotated label equals: 'label2'.
 	
 
 ]
@@ -88,12 +88,57 @@ MicrodownParserTest >> testAnchorMarkupInsideLine [
 MicrodownParserTest >> testAnnotatedBlock [
 
 	| source root annotated |
-	source := AnnotatedParagraphMarkup , 'important this is an important paragraph on one line.'.
+	source := AnnotatedParagraphOpeningMarkup , 'important]
+> this is an important paragraph on one line.'.
 	root :=  parser parse: source.
 	self assert: root children size equals: 1.
 	annotated := root children first. 
+	self assert: annotated class equals: MicAnnotatedParagraphBlock.
 	self assert: annotated label equals: 'important'.
 	self assert: annotated text equals: 'this is an important paragraph on one line.'
+	
+
+]
+
+{ #category : 'tests - annotated-paragraph' }
+MicrodownParserTest >> testAnnotatedBlockBackwardCompatible [
+
+	| source root annotated |
+	source := '!!important This is an important paragraph on one line.'.
+	root :=  parser parse: source.
+	self assert: root children size equals: 1.
+	annotated := root children first. 
+	self assert: annotated class equals: MicAnnotatedParagraphBlock.
+	self assert: annotated label equals: 'important'.
+	self assert: annotated text equals: 'This is an important paragraph on one line.'
+	
+
+]
+
+{ #category : 'tests - annotated-paragraph' }
+MicrodownParserTest >> testAnnotatedBlockBackwardCompatibleOnLongLine [
+
+	| source root annotated |
+	source := '!!important This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. '.
+	root :=  parser parse: source.
+	self assert: root children size equals: 1.
+	annotated := root children first. 
+	self assert: annotated class equals: MicAnnotatedParagraphBlock.
+	self assert: annotated label equals: 'important'.
+	self assert: annotated text equals: 'This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line. This is an important paragraph on one line.'
+]
+
+{ #category : 'tests - annotated-paragraph' }
+MicrodownParserTest >> testAnnotatedBlockBackwardCompatibleWithDifferentLabel [
+
+	| source root annotated |
+	source := '!!important This is an important paragraph on one line.'.
+	root :=  parser parse: source.
+	self assert: root children size equals: 1.
+	annotated := root children first. 
+	self assert: annotated class equals: MicAnnotatedParagraphBlock.
+	self assert: annotated label equals: 'important'.
+	self assert: annotated text equals: 'This is an important paragraph on one line.'
 	
 
 ]
@@ -102,8 +147,9 @@ MicrodownParserTest >> testAnnotatedBlock [
 MicrodownParserTest >> testAnnotatedBlockOnMultipleLinesParserLogic [
 
 	| source root annotated  line |
-	source := (AnnotatedParagraphMarkup , 'important this is an 
-important point because...!') readStream.
+	source := (AnnotatedParagraphOpeningMarkup , 'important]
+> this is an 
+> important point because...!') readStream.
 	
 	"first the root block"
 	root := parser parse: ''.
@@ -115,9 +161,15 @@ important point because...!') readStream.
 	self assert: annotated parent equals: root.  
 	
 	self assert: annotated label equals: 'important'.
-	self assert: (annotated instVarNamed: 'body') equals: 'this is an'.
 	
 	"third the second line"
+	line := source nextLine.
+	self assert: (annotated canConsumeLine: line).
+	annotated := parser handleLine: line.
+	self assert: parser current equals: annotated.
+	self assert: (annotated instVarNamed: 'body') equals: 'this is an'.
+	
+"fourth the third line"
 	line := source nextLine.
 	self assert: (annotated canConsumeLine: line).
 	annotated := parser handleLine: line.
@@ -130,8 +182,9 @@ important point because...!'.
 { #category : 'tests - annotated-paragraph' }
 MicrodownParserTest >> testAnnotatedBlockOnTwoLines [
 	| source root annotated |
-	source := AnnotatedParagraphMarkup , 'important this is an important 
-paragraph on two lines.'.
+	source := AnnotatedParagraphOpeningMarkup , 'important]
+> this is an important 
+> paragraph on two lines.'.
 	root := parser parse: source.
 	self assert: root children size equals: 1.
 	annotated := root children first. 
@@ -144,23 +197,25 @@ paragraph on two lines.'
 { #category : 'tests - annotated-paragraph' }
 MicrodownParserTest >> testAnnotatedBlockOnTwoLinesWithFormatting [
 	| source root annotated |
-	source := AnnotatedParagraphMarkup , 'important **this** is an _important_ 
-paragraph on two lines.'.
+	source := AnnotatedParagraphOpeningMarkup , 'important]
+> **this** is an _important_ 
+> paragraph on two lines.'.
 	root := parser parse: source.
 	self assert: root children size equals: 1.
 	annotated := root children first. 
 	self assert: annotated label equals: 'important'.
-	self assert: annotated text equals: 'this is an important
-paragraph on two lines.'.
-	self assert: annotated textElements first kind equals: 'bold'.
-	self assert: annotated textElements third kind equals: 'italic'.
+	self 
+		assert: annotated children asArray asString 
+		equals: 'an Array(BoldFormat{ Text(this) } Text( is an ) ItalicFormat{ Text(important) } Text(
+paragraph on two lines.))'
 ]
 
 { #category : 'tests - annotated-paragraph' }
 MicrodownParserTest >> testAnnotatedBlockTextElements [
 
 	| source root annotated |
-	source := AnnotatedParagraphMarkup , 'important this is an **important** paragraph on one line.'.
+	source := AnnotatedParagraphOpeningMarkup , 'important]
+> this is an **important** paragraph on one line.'.
 	root :=  parser parse: source.
 	self assert: root children size equals: 1.
 	annotated := root children first. 
@@ -176,8 +231,9 @@ MicrodownParserTest >> testAnnotatedBlockWithListParserLogic [
 	"The test does not test what we want. We want a listblock inside the annotatedBlock"
 	|  source root annotated  line |
 	self flag: #fixme.
-	source := (AnnotatedParagraphMarkup , 'important this is a point
-- one
+	source := (AnnotatedParagraphOpeningMarkup , 'important]
+> this is a point
+> - one
 * two ' ) readStream.
 
  	parser := self parser. 
@@ -192,9 +248,16 @@ MicrodownParserTest >> testAnnotatedBlockWithListParserLogic [
 	self assert: annotated parent equals: root.  
 	
 	self assert: annotated label equals: 'important'.
-	self assert: (annotated instVarNamed: 'body') equals: 'this is a point'.
 	
 	"third the second line"
+	line := source nextLine.
+	
+	self assert: (annotated canConsumeLine: line).
+	annotated := parser handleLine: line.
+	self assert: parser current equals: annotated.
+	self assert: (annotated instVarNamed: 'body') equals: 'this is a point'.
+	
+	"fourth the third line"
 	line := source nextLine.
 	
 	self assert: (annotated canConsumeLine: line).
@@ -328,11 +391,14 @@ MicrodownParserTest >> testHandlePrefixTabs [
 
 { #category : 'tests - header' }
 MicrodownParserTest >> testHeaderLevel4 [
+
 	| source root |
-	source := (HeaderMarkup repeat: 4), '    Level four'.
+	source := (HeaderMarkup repeat: 4) , '    Level four'.
 	root := self parser parse: source.
 	self assert: root children size equals: 1.
-	self assert: root children first header equals: 'Level four'.
+	self
+		assert: root children first children first bodyString
+		equals: 'Level four'.
 	self assert: root children first level equals: 4
 ]
 
@@ -340,15 +406,16 @@ MicrodownParserTest >> testHeaderLevel4 [
 MicrodownParserTest >> testHeaderLevel4WithBold [
 
 	| source root |
-	source := (HeaderMarkup repeat: 4), 'Level **four** `mono` end'.
+	source := (HeaderMarkup repeat: 4) , 'Level **four** `mono` end'.
 	root := self parser parse: source.
 	self assert: root children size equals: 1.
-	self assert: root children first children first substring equals: 'Level '.
-	self assert: root children first children second substring equals: 'four'.
-	self assert: root children first children third substring equals: ' '.
-	self assert: root children first children fourth substring equals: 'mono'.
-	self assert: root children first children fifth substring equals: ' end'.
-	self assert: root children first level equals: 4.
+	self
+		assert: root children first children first bodyString
+		equals: 'Level '.
+	self
+		assert: root children first children asArray asString
+		equals:
+		'an Array(Text(Level ) BoldFormat{ Text(four) } Text( ) Monospace(mono) Text( end))'
 ]
 
 { #category : 'tests - horizontal' }
@@ -429,15 +496,19 @@ support(I) \geq minsup \}'
 MicrodownParserTest >> testMathBlockWithArguments [
 
 	| source root math |
-	source := MathOpeningBlockMarkup, 'label=equation&caption=doNiceMath' , String cr, 
-	 '\mathcal{F} = \{ I \subseteq B | support(I) \geq minsup \}', String cr,
-	MathClosingBlockMarkup, String cr.
+	source := MathOpeningBlockMarkup
+	          , 'anchor=equation&caption=doNiceMath' , String cr
+	          ,
+	          '\mathcal{F} = \{ I \subseteq B | support(I) \geq minsup \}'
+	          , String cr , MathClosingBlockMarkup , String cr.
 
-	root :=  parser parse: source.
+	root := parser parse: source.
 	self assert: root children size equals: 1.
 	math := root children first.
-	self assert: (math arguments at: 'label') equals: 'equation'.
-	self assert: (math arguments at: 'caption') first substring equals: 'doNiceMath'
+	self assert: math anchor equals: 'equation'.
+	self
+		assert: (math arguments at: 'caption') first bodyString
+		equals: 'doNiceMath'
 ]
 
 { #category : 'tests - path' }
@@ -505,14 +576,15 @@ this is a code block
 { #category : 'tests - table' }
 MicrodownParserTest >> testPipeEscape [
 
-	| tableBlock firstElementOfSecondRowAsString|
+	| tableBlock firstElementOfSecondRowAsString |
 	tableBlock := (parser parse: '
 |foo|bar|
 |12\|3|456|') children first.
 	"Extract the text node"
 	firstElementOfSecondRowAsString := tableBlock rows second first.
 	"now get to the actual string stored there"
-	firstElementOfSecondRowAsString := firstElementOfSecondRowAsString first substring.
+	firstElementOfSecondRowAsString := firstElementOfSecondRowAsString
+		                                   first bodyString.
 	self assert: firstElementOfSecondRowAsString equals: '12|3'
 ]
 

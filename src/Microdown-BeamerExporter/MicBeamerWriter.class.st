@@ -1,5 +1,8 @@
 "
-I export mainly slides in Beamer LaTeX. Note that I do not generate the full beamer but the body of the slides. The beamer template can be for example the one of Pillar/presentation. 
+I export mainly slides in Beamer LaTeX. 
+Slides are expressed as MicSlideBlock nodes whose surface syntax use the Pharo extension facilities (`<!slide|title   body !>`).
+
+Note that I do not generate the full beamer but the body of the slides. The beamer template can be for example the one of Pillar/presentation. 
 
 
 ```
@@ -49,8 +52,9 @@ Metacello new
 Class {
 	#name : 'MicBeamerWriter',
 	#superclass : 'MicLaTeXWriter',
-	#category : 'Microdown-BeamerExporter',
-	#package : 'Microdown-BeamerExporter'
+	#category : 'Microdown-BeamerExporter-Slide',
+	#package : 'Microdown-BeamerExporter',
+	#tag : 'Slide'
 }
 
 { #category : 'basic ressources' }
@@ -164,33 +168,21 @@ MicBeamerWriter >> templateForConfiguration: aConfiguration [
 
 { #category : 'blocks - code' }
 MicBeamerWriter >> visitCode: aCodeBlock [
+
+	"simplify dramatically the logic. 
+	In Beamer we only support \begin{listing}{}
+	caption and anchor do not seem to work at LaTeX level. "	
+
 	| env |
-	env := (aCodeBlock hasCaption and: [ aCodeBlock hasLabel ])
-		ifTrue: [
-			canvas environment 
-				name: 'listing';
-				optParameter: 'label=', aCodeBlock label;
-				optParameter: 'caption={' , (self getStringForAll: aCodeBlock captionElements), '}';
-				yourself ]
-		ifFalse: [
-			env := aCodeBlock hasCaption 
-				ifTrue: [ 
-					canvas environment 
-						name: 'listing';
-						optParameter: 'caption={' , (self getStringForAll: aCodeBlock captionElements), '}';
-						yourself ]
-				ifFalse: [ 
-					env := aCodeBlock hasLabel 
-						ifTrue: [
-							canvas environment 
-								name: 'listing';
-								optParameter: 'label=', aCodeBlock label;
-								yourself ]
-						ifFalse: [
-							canvas environment 
-								name: 'listing';
-								yourself ]]].
-	env with: [ canvas nextPutAllLines: aCodeBlock body. canvas newLine ]
+	env := canvas environment
+					name: 'listing';
+					parameter: ''; "important else it will breaks"
+					yourself.
+	env with: [
+		self writeRawDuring: [ 
+			canvas nextPutAllLines: aCodeBlock body ].
+			canvas newLine ].
+
 ]
 
 { #category : 'visiting' }

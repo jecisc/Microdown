@@ -43,24 +43,13 @@ MicMicrodownTextualBuilder >> anchorReference: aText [
 
 { #category : 'element - annotated' }
 MicMicrodownTextualBuilder >> annotated: annotation paragraph:  aBlock [
-	"!!Important 
+	"Was !!Important 
 	
-	attention there is not space between the !! and the label (annotation in pillar) or we should improve the microdown parser"
+	attention there is not space between the !! and the label (annotation in pillar) or we should improve the microdown parser.
+	Now this is >[! Important ]"
+	
 	self rawAnnotated: annotation paragraph: aBlock. 
 	self newLine
-
-]
-
-{ #category : 'element - annotated' }
-MicMicrodownTextualBuilder >> annotatedAnnotation: annotation [
-	"I'm made to be followed by a paragraph. I manage the space between the annotation/label and the paragraph."
-	
-	"!!Important there is not space between the !! and the label (annotation in pillar) or we should improve the microdown parser"
-	self
-		raw: AnnotatedParagraphMarkup;
-		raw: annotation;
-		raw: String space
-	
 
 ]
 
@@ -519,13 +508,23 @@ MicMicrodownTextualBuilder >> raw: aString [
 
 { #category : 'element - annotated' }
 MicMicrodownTextualBuilder >> rawAnnotated: annotation paragraph:  aBlock [
-	"!!Important 
+	"It was !!Important 
 	
-	attention there is not space between the !! and the label (annotation in pillar) or we should improve the microdown parser"
+	attention there is not space between the !! and the label (annotation in pillar) or we should improve the microdown parser
+	
+	now we use 
+	
+	>[! Important]
+	> text 
+	> text2
+	
+	"
+
 	self
-		raw: AnnotatedParagraphMarkup;
-		raw: annotation; 
-		raw: String space;
+		raw: AnnotatedParagraphOpeningMarkup;
+		raw: annotation;
+		raw: AnnotatedParagraphClosingMarkup ;
+		raw: Character cr;
 		rawParagraph: aBlock
 	
 
@@ -624,6 +623,19 @@ MicMicrodownTextualBuilder >> strike: aBlock [
 	self raw: StrikeMarkup.
 	aBlock value.
 	self raw: StrikeMarkup.
+]
+
+{ #category : 'writing during' }
+MicMicrodownTextualBuilder >> textWithBracket: aString [
+
+	| lines |
+	lines := aString substrings: String crlf.
+	lines do: [ :each |
+		self
+			raw: $>;
+			raw: String space;
+			raw: each;
+			raw: Character cr ]
 ]
 
 { #category : 'element - list' }

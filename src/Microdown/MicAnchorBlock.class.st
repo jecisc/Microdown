@@ -1,10 +1,10 @@
 "
-I'm block that represents an anchor to a section. This way text can refer to the anchor to refer to the section. 
+I'm block that represents an anchor to a section. This way, text can refer to the anchor to refer to the section. 
 
-```
+```language=text
 # A section
 @mylovelySection
-``` 
+```
 "
 Class {
 	#name : 'MicAnchorBlock',
@@ -32,6 +32,12 @@ MicAnchorBlock >> addLineAndReturnNextNode: line [
 	^ self
 ]
 
+{ #category : 'accessing' }
+MicAnchorBlock >> anchorLabel [
+	"This should only be invoked when checking references"
+	^ self label
+]
+
 { #category : 'testing' }
 MicAnchorBlock >> hasLabel [ 
 	label ifNil: [ ^ false ].
@@ -44,8 +50,16 @@ MicAnchorBlock >> label [
 ]
 
 { #category : 'accessing' }
-MicAnchorBlock >> label: anObject [
-	label := anObject
+MicAnchorBlock >> label: aLabel [
+    label := aLabel.
+    
+]
+
+{ #category : 'printing' }
+MicAnchorBlock >> printOn: aStream [
+
+	super printOn: aStream.
+	label ifNotNil: [ aStream nextPutAll: ' (' , label , ')' ]
 ]
 
 { #category : 'accessing' }
