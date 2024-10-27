@@ -12,7 +12,7 @@ Class {
 { #category : 'kinds' }
 MicAnchorResult class >> errorType [
 
-	^ 'UndefinedAnchor'
+	^ 'Anchor problem'
 ]
 
 { #category : 'accessing' }
@@ -36,7 +36,7 @@ MicAnchorResult >> explanation [
 
 { #category : 'accessing' }
 MicAnchorResult >> isWhat [
-	^  'undefined'
+	^  'anchor problem'
 ]
 
 { #category : 'accessing' }
