@@ -30,18 +30,6 @@ MicFigureBlock class >> openingDelimiter [
     ^ FigureNameOpenerMarkup
 ]
 
-{ #category : 'testing' }
-MicFigureBlock >> hasAnchor [
-
-	^ self anchor isNotNil
-]
-
-{ #category : 'testing' }
-MicFigureBlock >> hasCaption [
-	
-	^ captionElements isNotNil 
-]
-
 { #category : 'visiting' }
 MicFigureBlock >> accept: aVisitor [
  	^ aVisitor visitFigure: self
@@ -57,6 +45,12 @@ MicFigureBlock >> closeMe [
 
 	super closeMe.
 	self children do: [ :each | each basicParent: self ].
+]
+
+{ #category : 'testing' }
+MicFigureBlock >> hasCaption [
+	
+	^ children isNotNil 
 ]
 
 { #category : 'printing' }

@@ -12,7 +12,8 @@ Class {
 }
 
 { #category : 'asserting' }
-MicAbstractLaTexWriterTest class >> shouldInheritSelectors [
+MicAbstractLaTexWriterTest class >> isAbstract [ 
+
 	^ true
 ]
 
@@ -65,9 +66,10 @@ MicAbstractLaTexWriterTest >> factory: aFactory [
 
 { #category : 'accessing' }
 MicAbstractLaTexWriterTest >> newLine: aNewLine [
-	(aNewLine = String cr) ifTrue:[ writer crAsNewLine ].
-	(aNewLine = String lf) ifTrue:[ writer lfAsNewLine ].
-	(aNewLine = String crlf) ifTrue:[ writer crlfAsNewLine ].
+
+	aNewLine = String cr ifTrue: [ writer crAsNewLine ].
+	aNewLine = String lf ifTrue: [ writer lfAsNewLine ].
+	aNewLine = String crlf ifTrue: [ writer crlfAsNewLine ].
 	newLine := aNewLine
 ]
 
@@ -688,9 +690,4 @@ MicAbstractLaTexWriterTest >> writeForElement: aNode [
 
 	writer visit: aNode.
 
-]
-
-{ #category : 'accessing' }
-MicAbstractLaTexWriterTest >> writer: aWriter [
-	writer := aWriter new
 ]
