@@ -28,6 +28,7 @@ MicFigureBlock class >> closingDelimiter [
 MicFigureBlock class >> openingDelimiter [
   
     ^ FigureNameOpenerMarkup
+]
 
 { #category : 'testing' }
 MicFigureBlock >> hasAnchor [
