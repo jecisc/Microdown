@@ -26,8 +26,20 @@ MicFigureBlock class >> closingDelimiter [
 
 { #category : 'accessing' }
 MicFigureBlock class >> openingDelimiter [
+  
+    ^ FigureNameOpenerMarkup
+]
 
- 	^ FigureNameOpenerMarkup
+{ #category : 'testing' }
+MicFigureBlock >> hasAnchor [
+
+	^ self anchor isNotNil
+]
+
+{ #category : 'testing' }
+MicFigureBlock >> hasCaption [
+	
+	^ captionElements isNotNil 
 ]
 
 { #category : 'visiting' }
