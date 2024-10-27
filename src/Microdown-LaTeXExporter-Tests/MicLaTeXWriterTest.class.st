@@ -5,7 +5,19 @@ Class {
 	#package : 'Microdown-LaTeXExporter-Tests'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'asserting' }
+MicLaTeXWriterTest class >> isAbstract [ 
+
+	^ false
+]
+
+{ #category : 'asserting' }
+MicLaTeXWriterTest class >> shouldInheritSelectors [
+
+	^ true
+]
+
+{ #category : 'tests' }
 MicLaTeXWriterTest >> testCodeblock [
 
 	self writeFor: (factory codeblockNoParamBody: 'this is a code').
@@ -14,7 +26,7 @@ MicLaTeXWriterTest >> testCodeblock [
 													'\end{listing}', newLine
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'tests' }
 MicLaTeXWriterTest >> testCodeblockWithCaption [
 
 	self writeFor: (factory codeblock: 'caption=Pharo is **cool**' body: 'this is a code').
@@ -23,7 +35,7 @@ MicLaTeXWriterTest >> testCodeblockWithCaption [
 													'\end{listing}', newLine
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'tests' }
 MicLaTeXWriterTest >> testCodeblockWithLabel [
 
 	self writeFor: (factory codeblock: 'label=Pharo' body: 'this is a code').
@@ -93,10 +105,11 @@ MicLaTeXWriterTest >> testFigureWithEmptyCaption [
 
 	self writeFor: '![](figures/f.png)'.
 	self
-		assert: writer contents
+		assert: writer contents   
 		equals:
-			newLine , '\begin{center}', newLine, '\includegraphics[width=1.0\textwidth]{figures/f.png}'
-			, '\end{center}', newLine, newLine
+			newLine, '\begin{figure}[htpb]', newLine , '\begin{center}', newLine, '\includegraphics[width=1.0\textwidth]{figures/f.png}', newLine, '\caption{}', newLine, 
+			 '\end{center}', newLine, '\end{figure}', newLine,  newLine  
+			
 ]
 
 { #category : 'tests' }
@@ -576,22 +589,8 @@ car il a etait fait pour cela'.
 'car il a etait fait pour cela'
 ]
 
-{ #category : 'tests' }
-MicLaTeXWriterTest >> writeFor: aString [ 
-	| mic |
-	mic := parser parse: aString.
-	writer visit: mic.
-
-]
-
-{ #category : 'tests' }
-MicLaTeXWriterTest >> writeForElement: aNode [
-
-	writer visit: aNode.
-
-]
-
 { #category : 'accessing' }
-MicLaTeXWriterTest >> writer: aWriter [
-	writer := aWriter new
+MicLaTeXWriterTest >> writer: aWriterClass [
+
+	writer := aWriterClass new.
 ]

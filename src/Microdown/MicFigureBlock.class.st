@@ -50,7 +50,7 @@ MicFigureBlock >> closeMe [
 { #category : 'testing' }
 MicFigureBlock >> hasCaption [
 	
-	^ captionElements isNotNil 
+	^ children isNotNil 
 ]
 
 { #category : 'printing' }
