@@ -49,17 +49,6 @@ MicReferenceChecker >> addBadFigureReference: anFigure [
 ]
 
 { #category : 'accessing' }
-MicReferenceChecker >> addBadReferenceAnchor: anAnchorReference [
-
-	| micResultInstance |
-	micResultInstance := MicUndefinedAnchorResult new.
-	micResultInstance
-		anchorLabel: anAnchorReference anchorLabel;
-		sourceFileReference: anAnchorReference fromFile.
-	results add: micResultInstance
-]
-
-{ #category : 'accessing' }
 MicReferenceChecker >> addDuplicatedAnchor: anAnchor [
 
 	| micResultInstance |
@@ -80,6 +69,17 @@ MicReferenceChecker >> addDuplicatedFirstAnchor: anAnchor [
 				self addDuplicatedAnchor: each ] ] ]
 ]
 
+{ #category : 'accessing' }
+MicReferenceChecker >> addReferenceToUnexistingAnchor: anAnchorReference [
+
+	| micResultInstance |
+	micResultInstance := MicReferenceToUnexistingAnchorResult new.
+	micResultInstance
+		anchorLabel: anAnchorReference anchorLabel;
+		sourceFileReference: anAnchorReference fromFile.
+	results add: micResultInstance
+]
+
 { #category : 'main API' }
 MicReferenceChecker >> checkDirectory: aDir [
 	"Take the directory, parse all its children with microdown file parser and let the visitor visit each time then return visitor is ok which should be true if every thing is okay, the visitor turned out to treat the many documents that it visits as one, so if anchor is duplicated in another file it will detect that . "
@@ -96,7 +96,7 @@ MicReferenceChecker >> checkList: aCollection [
 		document := Microdown parseFile: each.
 		document accept: self ].
 	self 
-		collectBadReferences;
+		collectReferencesToUnexistingAnchors;
 		collectBadFigureReferences 
 ]
 
@@ -129,7 +129,7 @@ MicReferenceChecker >> collectBadFigureReferences [
 ]
 
 { #category : 'visiting' }
-MicReferenceChecker >> collectBadReferences [
+MicReferenceChecker >> collectReferencesToUnexistingAnchors [
 	"Should be called after all the docs are visited otherwise the result can be wrong."
 
 	| badReference existingAnchorNames |
@@ -137,7 +137,7 @@ MicReferenceChecker >> collectBadReferences [
 	badReference := references reject: [ :anchorReference |
 		                existingAnchorNames includes:
 			                anchorReference anchorLabel ].
-	badReference do: [ :each | self addBadReferenceAnchor: each ]
+	badReference do: [ :each | self addReferenceToUnexistingAnchor: each ]
 ]
 
 { #category : 'internal' }

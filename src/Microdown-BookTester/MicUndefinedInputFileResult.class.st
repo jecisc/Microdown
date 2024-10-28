@@ -1,3 +1,6 @@
+"
+I represent an input referencing a file that does not exist.
+"
 Class {
 	#name : 'MicUndefinedInputFileResult',
 	#superclass : 'MicFileResult',

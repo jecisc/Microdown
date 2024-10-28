@@ -1,3 +1,6 @@
+"
+I'm the superclass of problem related to anchors.
+"
 Class {
 	#name : 'MicAnchorResult',
 	#superclass : 'MicResult',

@@ -643,7 +643,7 @@ MicReferenceCheckerTest >> testFigureFilePathToUnkFile [
 	visitor checkProject: self defFig1FilePathToUnk.
 	self deny: visitor isOkay.
 	self assert: visitor results size equals: 1.
-	self assert: visitor results first what equals: 'Fig1'.
+	self assert: visitor results first what equals: 'figures/f.png'.
 	self
 		assert: visitor results first sourceFileReference fullName
 		equals: '/myDirectory/defAndRefFig1.md'
@@ -673,7 +673,7 @@ MicReferenceCheckerTest >> testFullProjectWithReferencesToUnknowAnchor [
 
 	dict := checker results groupedBy: [ :each | each class ].
 	
-	unk := (dict at: MicUndefinedAnchorResult) first.
+	unk := (dict at: MicReferenceToUnexistingAnchorResult) first.
 	self assert: unk sourceFileReference fullName equals: '/myDirectory/sections/section2.md'.
 	self assert: unk anchorLabel equals: 'ancUnkS2'.
 	
@@ -695,7 +695,7 @@ See *@anchorSection1@*
 '.
 	visitor := MicReferenceChecker new. 
 	doc accept: visitor. 
-	visitor collectBadReferences. 
+	visitor collectReferencesToUnexistingAnchors. 
 	self assert: visitor isOkay
 ]
 
@@ -711,7 +711,7 @@ See *@anchorSection1@*
 '.
 	visitor := MicReferenceChecker new.
 	doc accept: visitor.
-	visitor collectBadReferences. 
+	visitor collectReferencesToUnexistingAnchors. 
 	self assert: visitor isOkay
 ]
 
@@ -729,7 +729,7 @@ See *@anchorSection1@*
 '.
 	visitor := MicReferenceChecker new.
 	doc accept: visitor.
-	visitor collectBadReferences. 
+	visitor collectReferencesToUnexistingAnchors. 
 	self assert: visitor isOkay
 ]
 
@@ -745,7 +745,7 @@ See *@anchorSection1@*
 	doc fromFile: 'fakedFile'.
 	visitor := MicReferenceChecker new.
 	doc accept: visitor.
-	visitor collectBadReferences. 
+	visitor collectReferencesToUnexistingAnchors. 
 	self deny: visitor isOkay
 ]
 

@@ -1,3 +1,6 @@
+"
+I represent a figure referencing an image file that does not exist.
+"
 Class {
 	#name : 'MicUndefinedFigureFileResult',
 	#superclass : 'MicFileResult',
