@@ -42,20 +42,20 @@ MicAnnotatedParagraphBlock >> closeMe [
 	body := self inlineParse: body
 ]
 
-{ #category : 'testing' }
+{ #category : 'accessing' }
 MicAnnotatedParagraphBlock >> defaultLabel [ 
 	
 	^ #note
 ]
 
-{ #category : 'testing' }
+{ #category : 'initialization' }
 MicAnnotatedParagraphBlock >> initialize [
 
 	super initialize.
 	validLabels := { #note. #important. #todo }
 ]
 
-{ #category : 'testing' }
+{ #category : 'accessing' }
 MicAnnotatedParagraphBlock >> lineMarkup [
 	
 	^ AnnotatedParagraphOpeningMarkup

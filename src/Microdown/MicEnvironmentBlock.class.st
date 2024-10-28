@@ -119,19 +119,19 @@ MicEnvironmentBlock >> arguments [
 	^ arguments
 ]
 
-{ #category : 'parse support' }
+{ #category : 'accessing' }
 MicEnvironmentBlock >> body [
 
 	^ String streamContents: [:s |  self bodyElements do: [ :each | s nextPutAll: each substring ] ]
 ]
 
-{ #category : 'parse support' }
+{ #category : 'accessing' }
 MicEnvironmentBlock >> bodyElements [
 
 	^ children
 ]
 
-{ #category : 'parse support' }
+{ #category : 'accessing' }
 MicEnvironmentBlock >> bodyFromLine: line [
 	
 	| newBlock |
@@ -176,7 +176,7 @@ MicEnvironmentBlock >> extractFirstLineFrom: aLine [
 		ifFalse: [ firstLine ]
 ]
 
-{ #category : 'parse support' }
+{ #category : 'initialization' }
 MicEnvironmentBlock >> initialize [
 
 	super initialize.
