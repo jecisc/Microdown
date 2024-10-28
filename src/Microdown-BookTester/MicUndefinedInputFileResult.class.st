@@ -21,6 +21,13 @@ MicUndefinedInputFileResult class >> headerString [
 	^ 'Undefined input files:'
 ]
 
+{ #category : 'accessing' }
+MicUndefinedInputFileResult >> explanation [
+
+	^ 'Undefined file input: ', self what,' (in file ', source fullName , ') refer to file that does not exist.'
+	
+]
+
 { #category : 'inputFileBlock:' }
 MicUndefinedInputFileResult >> inputFile [ 
 	

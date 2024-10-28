@@ -1,5 +1,5 @@
 "
-I'm a little util classes that encapsulates writing reports about analyses.
+I'm a little util class that encapsulates writing reports about analyses.
 "
 Class {
 	#name : 'MicAnalysisReportWriter',

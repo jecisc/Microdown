@@ -820,7 +820,7 @@ MicReferenceCheckerTest >> testReportingSTONFormatUnknownAnchorDir [
 { #category : 'skipped for now' }
 MicReferenceCheckerTest >> testReportingUnknownAnchorDir [
 
-	| dir file1 file2 visitor |
+	| file1 file2 visitor |
 	self skip.
 	dir := (FileSystem workingDirectory / 'myDirectory') asFileReference.
    dir ensureCreateDirectory.

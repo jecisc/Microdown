@@ -22,6 +22,13 @@ MicUndefinedFigureFileResult class >> headerString [
 ]
 
 { #category : 'accessing' }
+MicUndefinedFigureFileResult >> explanation [
+
+	^ 'Figure not found: ', self what,' (in file ', source fullName , ') was not found.'
+	
+]
+
+{ #category : 'accessing' }
 MicUndefinedFigureFileResult >> figureFileString: aString [
 	
 	figureFileString := aString

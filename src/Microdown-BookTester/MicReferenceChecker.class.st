@@ -43,7 +43,7 @@ MicReferenceChecker >> addBadFigureReference: anFigure [
 	| micResultInstance |
 	micResultInstance := MicUndefinedFigureFileResult new.
 	micResultInstance
-		figureFileString: anFigure anchorLabel;
+		figureFileString: anFigure reference relativePath;
 		sourceFileReference: anFigure fromFile.
 	results add: micResultInstance
 ]
@@ -95,8 +95,9 @@ MicReferenceChecker >> checkList: aCollection [
 		| document |
 		document := Microdown parseFile: each.
 		document accept: self ].
-	self collectBadReferences;
-	collectBadFigureReferences 
+	self 
+		collectBadReferences;
+		collectBadFigureReferences 
 ]
 
 { #category : 'main API' }
@@ -129,7 +130,7 @@ MicReferenceChecker >> collectBadFigureReferences [
 
 { #category : 'visiting' }
 MicReferenceChecker >> collectBadReferences [
-	" should be called just after all the docs are visited otherwise the result can be wrong"
+	"Should be called after all the docs are visited otherwise the result can be wrong."
 
 	| badReference existingAnchorNames |
 	existingAnchorNames := anchors collect: [ :each | each anchorLabel ].
