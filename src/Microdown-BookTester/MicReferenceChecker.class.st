@@ -26,27 +26,18 @@ Class {
 	#instVars : [
 		'reportWriter',
 		'references',
-		'anchors',
 		'duplicatedAnchors',
 		'results',
 		'rootDirectory',
-		'listOfFiles'
+		'listOfFiles',
+		'figures',
+		'anchorReferences',
+		'anchoringEntities'
 	],
 	#category : 'Microdown-BookTester-Analysis',
 	#package : 'Microdown-BookTester',
 	#tag : 'Analysis'
 }
-
-{ #category : 'accessing' }
-MicReferenceChecker >> addBadFigureReference: anFigure [
-
-	| micResultInstance |
-	micResultInstance := MicUndefinedFigureFileResult new.
-	micResultInstance
-		figureFileString: anFigure reference relativePath;
-		sourceFileReference: anFigure fromFile.
-	results add: micResultInstance
-]
 
 { #category : 'accessing' }
 MicReferenceChecker >> addDuplicatedAnchor: anAnchor [
@@ -62,7 +53,7 @@ MicReferenceChecker >> addDuplicatedAnchor: anAnchor [
 { #category : 'visiting' }
 MicReferenceChecker >> addDuplicatedFirstAnchor: anAnchor [
 
-	anchors do: [ :each |
+	anchoringEntities do: [ :each |
 		each anchorLabel = anAnchor anchorLabel ifTrue: [
 			(duplicatedAnchors includes: each) ifFalse: [
 				duplicatedAnchors add: each.
@@ -77,6 +68,28 @@ MicReferenceChecker >> addReferenceToUnexistingAnchor: anAnchorReference [
 	micResultInstance
 		anchorLabel: anAnchorReference anchorLabel;
 		sourceFileReference: anAnchorReference fromFile.
+	results add: micResultInstance
+]
+
+{ #category : 'accessing' }
+MicReferenceChecker >> addUnexistingFigureFile: aFigure [
+
+	| micResultInstance |
+	micResultInstance := MicUndefinedFigureFileResult new.
+	micResultInstance
+		figureFileString: aFigure reference path;
+		sourceFileReference: aFigure fromFile.
+	results add: micResultInstance
+]
+
+{ #category : 'accessing' }
+MicReferenceChecker >> addUnreferencedFigure: aFigure [
+
+	| micResultInstance |
+	micResultInstance := MicUnreferencedFigureResult new.
+	micResultInstance
+		figure: aFigure anchorLabel;
+		sourceFileReference: aFigure fromFile.
 	results add: micResultInstance
 ]
 
@@ -97,7 +110,8 @@ MicReferenceChecker >> checkList: aCollection [
 		document accept: self ].
 	self 
 		collectReferencesToUnexistingAnchors;
-		collectBadFigureReferences 
+		collectUnreferencedFigures
+		
 ]
 
 { #category : 'main API' }
@@ -115,29 +129,25 @@ MicReferenceChecker >> checkProject: aFileReference [
 	self checkList: listOfFiles
 ]
 
-{ #category : 'visiting' }
-MicReferenceChecker >> collectBadFigureReferences [
-	" should be called just after all the docs are visited otherwise the result can be wrong"
-
-	| badReference existingFigure |
-	existingFigure := anchors select: [ :each |
-		                  each isKindOf: MicFigureBlock ].
-	badReference := existingFigure reject: [ :figure |
-		                rootDirectory fileSystem exists:
-			                rootDirectory fullName ,'/',figure reference path ].
-	badReference do: [ :each | self addBadFigureReference: each ]
-]
-
-{ #category : 'visiting' }
+{ #category : 'internal' }
 MicReferenceChecker >> collectReferencesToUnexistingAnchors [
 	"Should be called after all the docs are visited otherwise the result can be wrong."
 
 	| badReference existingAnchorNames |
-	existingAnchorNames := anchors collect: [ :each | each anchorLabel ].
+	existingAnchorNames := anchoringEntities collect: [ :each | each anchorLabel ].
 	badReference := references reject: [ :anchorReference |
 		                existingAnchorNames includes:
 			                anchorReference anchorLabel ].
 	badReference do: [ :each | self addReferenceToUnexistingAnchor: each ]
+]
+
+{ #category : 'internal' }
+MicReferenceChecker >> collectUnreferencedFigures [
+
+	| unreferencedFigures anchorReferenceNames |
+	anchorReferenceNames := anchorReferences collect: [ :each | each anchorLabel ].
+	unreferencedFigures := figures reject: [ :figure |  anchorReferenceNames includes: figure anchorLabel ].
+	unreferencedFigures do: [ :each | self addUnreferencedFigure: each ]
 ]
 
 { #category : 'internal' }
@@ -160,7 +170,7 @@ MicReferenceChecker >> handleAnchorOf: anElement [
 		duplicatedAnchors add: anElement.
 		self addDuplicatedAnchor: anElement.
 		self addDuplicatedFirstAnchor: anElement. ].
-	anchors add: anElement
+	anchoringEntities add: anElement
 ]
 
 { #category : 'internal' }
@@ -180,7 +190,7 @@ MicReferenceChecker >> hasAlreadyDefinedAs: anAnchor [
 
 	| alreadyDefined |
 	alreadyDefined := false. 
-	anchors do: 
+	anchoringEntities do: 
 		 [ :each | each anchorLabel = anAnchor anchorLabel
 				ifTrue: [ alreadyDefined := true ] ].
 	^ alreadyDefined
@@ -194,7 +204,9 @@ MicReferenceChecker >> initialize [
 	rootDirectory := FileSystem workingDirectory.
 	results := OrderedCollection new.
 	references := OrderedCollection new.
-	anchors := OrderedCollection new.
+	figures := OrderedCollection new.
+	anchoringEntities := OrderedCollection new.
+	anchorReferences := OrderedCollection new.
 	duplicatedAnchors := OrderedCollection new.
 	"by default if the reporter is not set from outside
 	then it shares the results of this current checker."
@@ -264,7 +276,7 @@ MicReferenceChecker >> unknownAnchors [
 	unknown := OrderedCollection new. 
 	ref := references copy.
 	ref do: [ :reference |
-		(anchors noneSatisfy: [ :each | 
+		(anchoringEntities noneSatisfy: [ :each | 
 			ref anchorLabel = each anchorLabel ])
 				ifTrue: [ unknown add: reference ]  ].
 	^ unknown 
@@ -272,20 +284,24 @@ MicReferenceChecker >> unknownAnchors [
 
 { #category : 'visiting' }
 MicReferenceChecker >> visitAnchor: anAnchor [
-
+	"the problem with visit anchor is that it only concerns 
+	@anchor and not the one of figure.
+	So we should then keep a list of anchorNames for the figures, math equations
+	or reify these anchor - would be nicer"
+	
 	| isAlready |
 	isAlready := self hasAlreadyDefinedAs: anAnchor.
 	isAlready ifTrue: [
 		duplicatedAnchors add: anAnchor.
 		self addDuplicatedAnchor: anAnchor.
 		self addDuplicatedFirstAnchor: anAnchor. ].
-	anchors add: anAnchor
+	anchoringEntities add: anAnchor
 ]
 
 { #category : 'visiting' }
 MicReferenceChecker >> visitAnchorReference: anAnchorReference [
-	
-	references add: anAnchorReference
+
+	anchorReferences add: anAnchorReference
 ]
 
 { #category : 'visiting' }
@@ -296,8 +312,12 @@ MicReferenceChecker >> visitCode: aCodeBlock [
 
 { #category : 'visiting' }
 MicReferenceChecker >> visitFigure: aFigure [
-
-	self handleAnchorOf: aFigure
+	
+	figures add: aFigure. 
+	self handleAnchorOf: aFigure.
+	"check for unexisting file."
+	(aFigure fromFile parent / aFigure reference path) exists
+			ifFalse: [ self addUnexistingFigureFile: aFigure  ]
 ]
 
 { #category : 'visiting' }
