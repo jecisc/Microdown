@@ -54,6 +54,7 @@ MicReferenceCheckerTest >> defAncS0DoubleFig1Fig2RefAncS1 [
 
 	| doubleFig1 |
 	doubleFig1 := dir / 'defAncS0DoubleFig1Fig2RefAncS1.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
 	doubleFig1 writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 
 @ancS0
@@ -137,6 +138,7 @@ See *@Eq1@*
 MicReferenceCheckerTest >> defFig1AndRefFig1 [
 
 	defAndRefFig1 := dir / 'defAndRefFig1.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
 	defAndRefFig1 writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 1
 		
@@ -153,6 +155,7 @@ See *@Fig1@*
 MicReferenceCheckerTest >> defFig1AndRefToAncS0 [
 
 	defFig1AndRefToAnsC0 := fs / 'defFig1AndRefToAncS0.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
 	defFig1AndRefToAnsC0 ensureCreateFile.
 	defFig1AndRefToAnsC0 writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 1
@@ -167,6 +170,7 @@ See *@ancS0@*
 MicReferenceCheckerTest >> defFig1AndRefToAncUnkS0 [
 
 	defFig1AndRefToAncUnkS0 := fs / 'defFig1AndRefToAncUnkS0.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
 	defFig1AndRefToAncUnkS0 ensureCreateFile.
 	defFig1AndRefToAncUnkS0 writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 1
@@ -179,10 +183,25 @@ See *@ancUnkS0@*
 ]
 
 { #category : 'helpers - anchors & references' }
+MicReferenceCheckerTest >> defFig1FilePathToUnk [
+
+	defAndRefFig1 := dir / 'defAndRefFig1.md'.
+	defAndRefFig1 writeStreamDo: [ :stream |
+		stream nextPutAll: '# Section 1
+		
+![alittle caption.](figures/f.png anchor=Fig1)
+
+' ].
+	defAndRefFig1 ensureCreateFile.
+	^ defAndRefFig1
+]
+
+{ #category : 'helpers - anchors & references' }
 MicReferenceCheckerTest >> duplicatedFigSecEq [
 
 	| conflictBetweenFigSecEq |
 	conflictBetweenFigSecEq := dir / 'duplicatedFigSecEq.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
 	conflictBetweenFigSecEq writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 
 @ancS0
@@ -222,6 +241,7 @@ MicReferenceCheckerTest >> duplicatedFigSecEqPart1 [
 
 	| duplicatedFigSecEqPart1 |
 	duplicatedFigSecEqPart1 := dir / 'duplicatedFigSecEqPart1.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
 	duplicatedFigSecEqPart1 writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 
 @ancS0
@@ -237,8 +257,7 @@ $$
 # Section 3
 @ancS3
 
-'
- ].
+' ].
 	duplicatedFigSecEqPart1 ensureCreateFile.
 	^ duplicatedFigSecEqPart1
 ]
@@ -248,6 +267,7 @@ MicReferenceCheckerTest >> duplicatedFigSecEqPart2 [
 
 	| duplicatedFigSecEqPart2 |
 	duplicatedFigSecEqPart2 := dir / 'duplicatedFigSecEqPart2.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
 	duplicatedFigSecEqPart2 writeStreamDo: [ :stream |
 		stream nextPutAll: '
 # Duplication with Figure
@@ -274,6 +294,7 @@ See *@ancS1@* and *@ancS0@*
 MicReferenceCheckerTest >> fileDefAncS1UndAncS0 [
 
 	fileDefAncS1UndAncS0 := fs / 'fileDefAncS1UndAncS0.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
 	fileDefAncS1UndAncS0 ensureCreateFile.
 	fileDefAncS1UndAncS0 writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 1
@@ -283,7 +304,7 @@ MicReferenceCheckerTest >> fileDefAncS1UndAncS0 [
 See *@ancS0@*
 
 ' ].
-	fileDefAncS1UndAncS0 ensureCreateFile 
+	fileDefAncS1UndAncS0 ensureCreateFile
 ]
 
 { #category : 'helpers - anchors & references' }
@@ -355,11 +376,14 @@ MicReferenceCheckerTest >> testDefFig1AndRefToAncUnkS0 [
 	| visitor |
 	self defFig1AndRefToAncUnkS0.
 	visitor := MicReferenceChecker new.
+	visitor rootDirectory: dir.
 	visitor checkList: { defFig1AndRefToAncUnkS0 }.
 	self deny: visitor isOkay.
 	self assert: visitor results size equals: 1.
 	self assert: visitor results first anchorLabel equals: 'ancUnkS0'.
-	self assert: visitor results first sourceFileReference fullName equals: '/defFig1AndRefToAncUnkS0.md'
+	self
+		assert: visitor results first sourceFileReference fullName
+		equals: '/defFig1AndRefToAncUnkS0.md'
 ]
 
 { #category : 'tests - single file ok references' }
@@ -380,9 +404,9 @@ MicReferenceCheckerTest >> testDefFig1ReferToAFigureInFile [
 	| visitor |
 	self defFig1AndRefFig1.
 	visitor := MicReferenceChecker new.
+	visitor rootDirectory: dir.
 	visitor checkList: { defAndRefFig1 }.
-	self assert: visitor isOkay.
-	
+	self assert: visitor isOkay
 ]
 
 { #category : 'tests - single file' }
@@ -534,11 +558,13 @@ MicReferenceCheckerTest >> testDuplicatedBetweenSectionFigureEq [
 	| conflictBetweenFigSecEq visitor |
 	conflictBetweenFigSecEq := self duplicatedFigSecEq.
 	visitor := MicReferenceChecker new.
+	visitor rootDirectory: dir.
 	visitor checkList: { conflictBetweenFigSecEq }.
 	self deny: visitor isOkay.
 	self
 		assert: (visitor results collect: [ :each | each anchorLabel ])
-		equals: OrderedCollection <- #( 'ancS1' 'ancS1' 'ancS0' 'ancS0' 'fig2' 'fig2' )
+		equals: OrderedCollection
+			<- #( 'ancS1' 'ancS1' 'ancS0' 'ancS0' 'fig2' 'fig2' )
 ]
 
 { #category : 'tests - duplicated' }
@@ -548,11 +574,15 @@ MicReferenceCheckerTest >> testDuplicatedBetweenSectionFigureEqInDifferentFile [
 	duplicatedFigSecEqPart1 := self duplicatedFigSecEqPart1.
 	duplicatedFigSecEqPart2 := self duplicatedFigSecEqPart2.
 	visitor := MicReferenceChecker new.
-	visitor checkList: { duplicatedFigSecEqPart1 . duplicatedFigSecEqPart2 }.
+	visitor rootDirectory: dir.
+	visitor checkList: {
+			duplicatedFigSecEqPart1.
+			duplicatedFigSecEqPart2 }.
 	self deny: visitor isOkay.
 	self
 		assert: (visitor results collect: [ :each | each anchorLabel ])
-		equals: OrderedCollection <- #( 'ancS1' 'ancS1' 'ancS0' 'ancS0' 'fig2' 'fig2')
+		equals: OrderedCollection
+			<- #( 'ancS1' 'ancS1' 'ancS0' 'ancS0' 'fig2' 'fig2' )
 ]
 
 { #category : 'tests - duplicated' }
@@ -561,19 +591,21 @@ MicReferenceCheckerTest >> testDuplicatedFigures [
 	| doubleFig1 checker dict dup1 |
 	doubleFig1 := self defAncS0DoubleFig1Fig2RefAncS1.
 	checker := MicReferenceChecker new.
+	checker rootDirectory: dir.
 	checker checkList: { doubleFig1 }.
 	self deny: checker isOkay.
 	self
 		assert: (checker results collect: [ :each | each anchorLabel ])
-		equals: OrderedCollection <- #( 'fig1' 'fig1' 'fig1' 'fig1' 'ancS1' ).
-		
+		equals:
+		OrderedCollection <- #( 'fig1' 'fig1' 'fig1' 'fig1' 'ancS1' ).
+
 	dict := checker results groupedBy: [ :each | each class ].
-	
+
 	dup1 := (dict at: MicDuplicatedAnchorResult) first.
-	self assert: dup1 sourceFileReference fullName equals: '/myDirectory/defAncS0DoubleFig1Fig2RefAncS1.md'.
-	self assert: dup1 anchorLabel equals: 'fig1'.
-	
-	
+	self
+		assert: dup1 sourceFileReference fullName
+		equals: '/myDirectory/defAncS0DoubleFig1Fig2RefAncS1.md'.
+	self assert: dup1 anchorLabel equals: 'fig1'
 ]
 
 { #category : 'tests - duplicated' }
@@ -600,6 +632,21 @@ MicReferenceCheckerTest >> testDuplicatedMaths [
 	dup2 := (dict at: MicDuplicatedAnchorResult) third.
 	self assert: dup2 sourceFileReference fullName equals: '/myDirectory/defAnCS0DoubleEq2DoubleEq1RefEq1.md'.
 	self assert: dup2 anchorLabel equals: 'Eq1'.
+]
+
+{ #category : 'tests - single file' }
+MicReferenceCheckerTest >> testFigureFilePathToUnkFile [
+
+	| visitor |
+	visitor := MicReferenceChecker new.
+	visitor rootDirectory: dir.
+	visitor checkProject: self defFig1FilePathToUnk.
+	self deny: visitor isOkay.
+	self assert: visitor results size equals: 1.
+	self assert: visitor results first what equals: 'Fig1'.
+	self
+		assert: visitor results first sourceFileReference fullName
+		equals: '/myDirectory/defAndRefFig1.md'
 ]
 
 { #category : 'tests - full project' }

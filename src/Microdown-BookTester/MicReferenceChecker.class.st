@@ -38,6 +38,17 @@ Class {
 }
 
 { #category : 'accessing' }
+MicReferenceChecker >> addBadFigureReference: anFigure [
+
+	| micResultInstance |
+	micResultInstance := MicUndefinedFigureFileResult new.
+	micResultInstance
+		figureFileString: anFigure anchorLabel;
+		sourceFileReference: anFigure fromFile.
+	results add: micResultInstance
+]
+
+{ #category : 'accessing' }
 MicReferenceChecker >> addBadReferenceAnchor: anAnchorReference [
 
 	| micResultInstance |
@@ -80,11 +91,12 @@ MicReferenceChecker >> checkDirectory: aDir [
 MicReferenceChecker >> checkList: aCollection [
 	"Pay attention checking a file in isolation is DIFFERENT from a list, because a document can have references between them and the checker should be shared amongst the documents since it collects the references."
 
-	aCollection do: [ :each | 
-			| document |
-			document := Microdown parseFile: each.
-			document accept: self ].
-	self collectBadReferences.
+	aCollection do: [ :each |
+		| document |
+		document := Microdown parseFile: each.
+		document accept: self ].
+	self collectBadReferences;
+	collectBadFigureReferences 
 ]
 
 { #category : 'main API' }
@@ -100,6 +112,19 @@ MicReferenceChecker >> checkProject: aFileReference [
 	listOfFiles := collector visitedFileStrings collect: [ :file |
 		               rootDirectory resolve: file ].
 	self checkList: listOfFiles
+]
+
+{ #category : 'visiting' }
+MicReferenceChecker >> collectBadFigureReferences [
+	" should be called just after all the docs are visited otherwise the result can be wrong"
+
+	| badReference existingFigure |
+	existingFigure := anchors select: [ :each |
+		                  each isKindOf: MicFigureBlock ].
+	badReference := existingFigure reject: [ :figure |
+		                rootDirectory fileSystem exists:
+			                rootDirectory fullName ,'/',figure reference path ].
+	badReference do: [ :each | self addBadFigureReference: each ]
 ]
 
 { #category : 'visiting' }
