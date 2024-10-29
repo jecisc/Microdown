@@ -660,15 +660,19 @@ MicReferenceCheckerTest >> testDuplicatedMaths [
 { #category : 'tests - single file' }
 MicReferenceCheckerTest >> testFigureFilePathToUnkFile [
 
-	| visitor |
+	| visitor refToUnexistingFiles |
 	visitor := MicReferenceChecker new.
 	visitor rootDirectory: dir.
 	visitor checkProject: self defFig1FilePathToUnk.
 	self deny: visitor isOkay.
 	self assert: visitor results size equals: 2.
-	self assert: visitor results first what equals: 'figures/f.png'.
+	refToUnexistingFiles := (visitor results groupedBy: [ :each | each class name ]) at: #MicUndefinedFigureFileResult.
+	self assert: refToUnexistingFiles size equals: 1.
+	self assert: refToUnexistingFiles first what equals: 'figures/f.png'.
+	self assert: refToUnexistingFiles first figureFileString equals: 'figures/f.png'.
+	
 	self
-		assert: visitor results first sourceFileReference fullName
+		assert: refToUnexistingFiles first sourceFileReference fullName
 		equals: '/myDirectory/defAndRefFig1.md'
 ]
 

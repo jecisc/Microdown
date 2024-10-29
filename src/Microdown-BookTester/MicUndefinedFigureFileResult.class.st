@@ -32,6 +32,12 @@ MicUndefinedFigureFileResult >> explanation [
 ]
 
 { #category : 'accessing' }
+MicUndefinedFigureFileResult >> figureFileString [
+
+	^ figureFileString
+]
+
+{ #category : 'accessing' }
 MicUndefinedFigureFileResult >> figureFileString: aString [
 	
 	figureFileString := aString
