@@ -388,10 +388,10 @@ MicReferenceCheckerTest >> testDefFig1AndRefToAncUnkS0 [
 	visitor rootDirectory: dir.
 	visitor checkList: { defFig1AndRefToAncUnkS0 }.
 	self deny: visitor isOkay.
-	self assert: visitor results size equals: 1.
-	self assert: visitor results first anchorLabel equals: 'ancUnkS0'.
+	self assert: visitor results size equals: 3.
+	self assert: visitor results second anchorLabel equals: 'ancUnkS0'.
 	self
-		assert: visitor results first sourceFileReference fullName
+		assert: visitor results second sourceFileReference fullName
 		equals: '/defFig1AndRefToAncUnkS0.md'
 ]
 
@@ -427,9 +427,9 @@ MicReferenceCheckerTest >> testDefS1ButRefersToS0UnknownAnchor [
 	visitor rootDirectory: dir.
 	visitor checkProject:  fileDefAncS1UndAncS0.
 	self deny: visitor isOkay.
-	self assert: visitor results size equals: 1.
-	self assert: visitor results first anchorLabel equals: 'ancS0'.
-	self assert: visitor results first sourceFileReference fullName equals: '/fileDefAncS1UndAncS0.md'
+	self assert: visitor results size equals: 3.
+	self assert: visitor results second anchorLabel equals: 'ancS0'.
+	self assert: visitor results second sourceFileReference fullName equals: '/fileDefAncS1UndAncS0.md'
 	
 ]
 
