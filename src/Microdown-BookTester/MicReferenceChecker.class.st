@@ -31,7 +31,6 @@ Class {
 		'rootDirectory',
 		'listOfFiles',
 		'figures',
-		'anchorReferences',
 		'anchoringEntities'
 	],
 	#category : 'Microdown-BookTester-Analysis',
@@ -136,8 +135,7 @@ MicReferenceChecker >> collectReferencesToUnexistingAnchors [
 	| badReference existingAnchorNames |
 	existingAnchorNames := anchoringEntities collect: [ :each | each anchorLabel ].
 	badReference := references reject: [ :anchorReference |
-		                existingAnchorNames includes:
-			                anchorReference anchorLabel ].
+		                existingAnchorNames includes: anchorReference anchorLabel ].
 	badReference do: [ :each | self addReferenceToUnexistingAnchor: each ]
 ]
 
@@ -145,7 +143,7 @@ MicReferenceChecker >> collectReferencesToUnexistingAnchors [
 MicReferenceChecker >> collectUnreferencedFigures [
 
 	| unreferencedFigures anchorReferenceNames |
-	anchorReferenceNames := anchorReferences collect: [ :each | each anchorLabel ].
+	anchorReferenceNames := references collect: [ :each | each anchorLabel ].
 	unreferencedFigures := figures reject: [ :figure |  anchorReferenceNames includes: figure anchorLabel ].
 	unreferencedFigures do: [ :each | self addUnreferencedFigure: each ]
 ]
@@ -206,7 +204,6 @@ MicReferenceChecker >> initialize [
 	references := OrderedCollection new.
 	figures := OrderedCollection new.
 	anchoringEntities := OrderedCollection new.
-	anchorReferences := OrderedCollection new.
 	duplicatedAnchors := OrderedCollection new.
 	"by default if the reporter is not set from outside
 	then it shares the results of this current checker."
@@ -301,7 +298,7 @@ MicReferenceChecker >> visitAnchor: anAnchor [
 { #category : 'visiting' }
 MicReferenceChecker >> visitAnchorReference: anAnchorReference [
 
-	anchorReferences add: anAnchorReference
+	references add: anAnchorReference
 ]
 
 { #category : 'visiting' }
