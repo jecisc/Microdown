@@ -9,11 +9,20 @@ Class {
 		'defFig1AndRefToAnsC0',
 		'defFig1AndRefToAncUnkS0',
 		'refToUnkS1',
-		'defCode1AndReferToCode1'
+		'defCode1AndReferToCode1',
+		'defFig1'
 	],
 	#category : 'Microdown-BookTester-Tests',
 	#package : 'Microdown-BookTester-Tests'
 }
+
+{ #category : 'as yet unclassified' }
+MicReferenceCheckerTest >> anchorNames: checker [
+
+	^ checker results
+		  select: [ :each | each isKindOf: MicAnchorResult ]
+		  thenCollect: [ :each | each anchorLabel ]
+]
 
 { #category : 'helpers - anchors & references' }
 MicReferenceCheckerTest >> defAnCS0DoubleEq2DoubleEq1RefEq1 [
@@ -135,6 +144,20 @@ See *@Eq1@*
 ]
 
 { #category : 'helpers - anchors & references' }
+MicReferenceCheckerTest >> defFig1 [
+
+	defFig1 := fs / 'defFig1.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
+	defFig1 ensureCreateFile.
+	defFig1 writeStreamDo: [ :stream |
+		stream nextPutAll: '# Section 1
+![alittle caption. %anchor=Fig1](figures/f.png)
+
+
+' ]
+]
+
+{ #category : 'helpers - anchors & references' }
 MicReferenceCheckerTest >> defFig1AndRefFig1 [
 
 	defAndRefFig1 := dir / 'defAndRefFig1.md'.
@@ -159,7 +182,7 @@ MicReferenceCheckerTest >> defFig1AndRefToAncS0 [
 	defFig1AndRefToAnsC0 ensureCreateFile.
 	defFig1AndRefToAnsC0 writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 1
-![alittle caption.](figures/f.png anchor=Fig1)
+![alittle caption. %anchor=Fig1](figures/f.png)
 
 See *@ancS0@*
 
@@ -360,14 +383,15 @@ MicReferenceCheckerTest >> testDefAndReferToAMathEquationInFile [
 { #category : 'tests - single file' }
 MicReferenceCheckerTest >> testDefFig1AndRefToAncS0UnknowAnchor [
 
-	| visitor |
+	| visitor badRefs |
 	self defFig1AndRefToAncS0.
 	visitor := MicReferenceChecker new.
 	visitor rootDirectory: dir.
 	visitor checkProject: defFig1AndRefToAnsC0.
 	self deny: visitor isOkay.
-	self assert: visitor results first anchorLabel equals: 'ancS0'.
-	self assert: visitor results first sourceFileReference fullName equals: '/defFig1AndRefToAncS0.md'
+	badRefs := visitor results  select: [ :each | each isKindOf: MicAnchorResult ].
+	self assert: badRefs first anchorLabel equals: 'ancS0'.
+	self assert: badRefs first sourceFileReference fullName equals: '/defFig1AndRefToAncS0.md'
 ]
 
 { #category : 'tests - single file ok references' }
@@ -379,10 +403,10 @@ MicReferenceCheckerTest >> testDefFig1AndRefToAncUnkS0 [
 	visitor rootDirectory: dir.
 	visitor checkList: { defFig1AndRefToAncUnkS0 }.
 	self deny: visitor isOkay.
-	self assert: visitor results size equals: 1.
-	self assert: visitor results first anchorLabel equals: 'ancUnkS0'.
+	self assert: visitor results size equals: 3.
+	self assert: visitor results second anchorLabel equals: 'ancUnkS0'.
 	self
-		assert: visitor results first sourceFileReference fullName
+		assert: visitor results second sourceFileReference fullName
 		equals: '/defFig1AndRefToAncUnkS0.md'
 ]
 
@@ -418,9 +442,9 @@ MicReferenceCheckerTest >> testDefS1ButRefersToS0UnknownAnchor [
 	visitor rootDirectory: dir.
 	visitor checkProject:  fileDefAncS1UndAncS0.
 	self deny: visitor isOkay.
-	self assert: visitor results size equals: 1.
-	self assert: visitor results first anchorLabel equals: 'ancS0'.
-	self assert: visitor results first sourceFileReference fullName equals: '/fileDefAncS1UndAncS0.md'
+	self assert: visitor results size equals: 3.
+	self assert: visitor results second anchorLabel equals: 'ancS0'.
+	self assert: visitor results second sourceFileReference fullName equals: '/fileDefAncS1UndAncS0.md'
 	
 ]
 
@@ -458,7 +482,7 @@ Just a reference See *@ancS1@*  ' ].
 { #category : 'skipped for now' }
 MicReferenceCheckerTest >> testDuplicatedAnchorDir [
 
-	| dir file1 file2 visitor   |
+	| file1 file2 visitor   |
 	self skip.
 	dir := (FileSystem workingDirectory / 'myDirectory') asFileReference.
    dir ensureCreateDirectory.
@@ -534,8 +558,7 @@ MicReferenceCheckerTest >> testDuplicatedAnchorInDifferentFilesOfTheSameDir [
 MicReferenceCheckerTest >> testDuplicatedAnchors [
 
 	| defAncS0TripleAncS1RefAncS1AncS0 checker dict dup1 |
-	defAncS0TripleAncS1RefAncS1AncS0 := self
-		                                    defAncS0TripleAncS1RefAncS1AncS0.
+	defAncS0TripleAncS1RefAncS1AncS0 := self defAncS0TripleAncS1RefAncS1AncS0.
 	checker := MicReferenceChecker new.
 	checker checkList: { defAncS0TripleAncS1RefAncS1AncS0 }.
 	self deny: checker isOkay.
@@ -562,7 +585,7 @@ MicReferenceCheckerTest >> testDuplicatedBetweenSectionFigureEq [
 	visitor checkList: { conflictBetweenFigSecEq }.
 	self deny: visitor isOkay.
 	self
-		assert: (visitor results collect: [ :each | each anchorLabel ])
+		assert: (self anchorNames: visitor)
 		equals: OrderedCollection
 			<- #( 'ancS1' 'ancS1' 'ancS0' 'ancS0' 'fig2' 'fig2' )
 ]
@@ -580,7 +603,7 @@ MicReferenceCheckerTest >> testDuplicatedBetweenSectionFigureEqInDifferentFile [
 			duplicatedFigSecEqPart2 }.
 	self deny: visitor isOkay.
 	self
-		assert: (visitor results collect: [ :each | each anchorLabel ])
+		assert: (self anchorNames: visitor)
 		equals: OrderedCollection
 			<- #( 'ancS1' 'ancS1' 'ancS0' 'ancS0' 'fig2' 'fig2' )
 ]
@@ -595,7 +618,7 @@ MicReferenceCheckerTest >> testDuplicatedFigures [
 	checker checkList: { doubleFig1 }.
 	self deny: checker isOkay.
 	self
-		assert: (checker results collect: [ :each | each anchorLabel ])
+		assert: (self anchorNames: checker)
 		equals:
 		OrderedCollection <- #( 'fig1' 'fig1' 'fig1' 'fig1' 'ancS1' ).
 
@@ -637,15 +660,19 @@ MicReferenceCheckerTest >> testDuplicatedMaths [
 { #category : 'tests - single file' }
 MicReferenceCheckerTest >> testFigureFilePathToUnkFile [
 
-	| visitor |
+	| visitor refToUnexistingFiles |
 	visitor := MicReferenceChecker new.
 	visitor rootDirectory: dir.
 	visitor checkProject: self defFig1FilePathToUnk.
 	self deny: visitor isOkay.
-	self assert: visitor results size equals: 1.
-	self assert: visitor results first what equals: 'Fig1'.
+	self assert: visitor results size equals: 2.
+	refToUnexistingFiles := (visitor results groupedBy: [ :each | each class name ]) at: #MicUndefinedFigureFileResult.
+	self assert: refToUnexistingFiles size equals: 1.
+	self assert: refToUnexistingFiles first what equals: 'figures/f.png'.
+	self assert: refToUnexistingFiles first figureFileString equals: 'figures/f.png'.
+	
 	self
-		assert: visitor results first sourceFileReference fullName
+		assert: refToUnexistingFiles first sourceFileReference fullName
 		equals: '/myDirectory/defAndRefFig1.md'
 ]
 
@@ -673,7 +700,7 @@ MicReferenceCheckerTest >> testFullProjectWithReferencesToUnknowAnchor [
 
 	dict := checker results groupedBy: [ :each | each class ].
 	
-	unk := (dict at: MicUndefinedAnchorResult) first.
+	unk := (dict at: MicReferenceToUnexistingAnchorResult) first.
 	self assert: unk sourceFileReference fullName equals: '/myDirectory/sections/section2.md'.
 	self assert: unk anchorLabel equals: 'ancUnkS2'.
 	
@@ -695,7 +722,7 @@ See *@anchorSection1@*
 '.
 	visitor := MicReferenceChecker new. 
 	doc accept: visitor. 
-	visitor collectBadReferences. 
+	visitor collectReferencesToUnexistingAnchors. 
 	self assert: visitor isOkay
 ]
 
@@ -709,10 +736,12 @@ MicReferenceCheckerTest >> testLowLevelReferToAFigure [
 See *@anchorSection1@*
 
 '.
+	doc fromFile: 'file.md' asFileReference.
 	visitor := MicReferenceChecker new.
 	doc accept: visitor.
-	visitor collectBadReferences. 
-	self assert: visitor isOkay
+	visitor collectReferencesToUnexistingAnchors. 
+	self assert: visitor results first class equals: MicUndefinedFigureFileResult 
+	
 ]
 
 { #category : 'tests - internal - parse only' }
@@ -729,7 +758,7 @@ See *@anchorSection1@*
 '.
 	visitor := MicReferenceChecker new.
 	doc accept: visitor.
-	visitor collectBadReferences. 
+	visitor collectReferencesToUnexistingAnchors. 
 	self assert: visitor isOkay
 ]
 
@@ -745,7 +774,7 @@ See *@anchorSection1@*
 	doc fromFile: 'fakedFile'.
 	visitor := MicReferenceChecker new.
 	doc accept: visitor.
-	visitor collectBadReferences. 
+	visitor collectReferencesToUnexistingAnchors. 
 	self deny: visitor isOkay
 ]
 
@@ -820,7 +849,7 @@ MicReferenceCheckerTest >> testReportingSTONFormatUnknownAnchorDir [
 { #category : 'skipped for now' }
 MicReferenceCheckerTest >> testReportingUnknownAnchorDir [
 
-	| dir file1 file2 visitor |
+	| file1 file2 visitor |
 	self skip.
 	dir := (FileSystem workingDirectory / 'myDirectory') asFileReference.
    dir ensureCreateDirectory.
@@ -876,4 +905,21 @@ MicReferenceCheckerTest >> testUndefinedInputFilesAreMentionedInResult [
 				}  includes: each)
 			]
 
+]
+
+{ #category : 'tests - single file' }
+MicReferenceCheckerTest >> testUnreferencedFigure [
+
+	| visitor badRefs unref |
+	self defFig1.
+	visitor := MicReferenceChecker new.
+	visitor rootDirectory: dir.
+	visitor checkProject: defFig1.
+	self deny: visitor isOkay.
+	badRefs := (visitor results groupedBy: [:each | each class name]) at: #MicUnreferencedFigureResult.
+	unref := badRefs first.
+	self assert: badRefs size equals: 1.
+	self assert: unref figurePath equals: 'figures/f.png'.
+	self assert: unref anchorLabel equals: 'Fig1'.
+	self assert: unref sourceFileReference fullName equals: '/defFig1.md'
 ]
