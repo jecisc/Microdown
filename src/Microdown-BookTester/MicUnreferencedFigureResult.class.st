@@ -5,7 +5,9 @@ Class {
 	#name : 'MicUnreferencedFigureResult',
 	#superclass : 'MicResult',
 	#instVars : [
-		'figure'
+		'figure',
+		'anchorLabel',
+		'figurePath'
 	],
 	#category : 'Microdown-BookTester-Results',
 	#package : 'Microdown-BookTester',
@@ -13,9 +15,21 @@ Class {
 }
 
 { #category : 'accessing' }
+MicUnreferencedFigureResult >> anchorLabel [
+
+	^ anchorLabel 
+]
+
+{ #category : 'accessing' }
+MicUnreferencedFigureResult >> anchorLabel: aString [
+
+	anchorLabel := aString
+]
+
+{ #category : 'accessing' }
 MicUnreferencedFigureResult >> explanation [
 
-	^ 'Figure ', self what,' (in file ', source fullName , ') is not referenced.'
+	^ 'Figure ', self what,' with anchor ', anchorLabel printString, ' (in file ', source fullName , ') is not referenced.'
 	
 ]
 
@@ -26,7 +40,19 @@ MicUnreferencedFigureResult >> figure: aFigureBlock [
 ]
 
 { #category : 'accessing' }
+MicUnreferencedFigureResult >> figurePath [
+
+	^ figurePath
+]
+
+{ #category : 'accessing' }
+MicUnreferencedFigureResult >> figurePath: aString [
+
+	figurePath := aString
+]
+
+{ #category : 'accessing' }
 MicUnreferencedFigureResult >> what [ 
 
-	^ figure printString
+	^ figurePath printString
 ]

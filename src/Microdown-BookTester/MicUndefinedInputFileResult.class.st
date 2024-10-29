@@ -51,5 +51,10 @@ MicUndefinedInputFileResult >> inputFileBlock: anInputFileBlock [
 { #category : 'accessing' }
 MicUndefinedInputFileResult >> what [ 
 
-	^ self inputFile
+	| path |
+	self flag: #fixItLatter.
+	path := self inputFileBlock path.
+	^ path isString 
+		ifTrue: [ path ]
+		ifFalse: [ path fullName ]
 ]

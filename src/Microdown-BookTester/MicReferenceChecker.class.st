@@ -87,7 +87,8 @@ MicReferenceChecker >> addUnreferencedFigure: aFigure [
 	| micResultInstance |
 	micResultInstance := MicUnreferencedFigureResult new.
 	micResultInstance
-		figure: aFigure anchorLabel;
+		figurePath: aFigure reference relativePath;
+		anchorLabel: aFigure anchorLabel;
 		sourceFileReference: aFigure fromFile.
 	results add: micResultInstance
 ]
