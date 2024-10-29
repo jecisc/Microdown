@@ -9,7 +9,8 @@ Class {
 		'defFig1AndRefToAnsC0',
 		'defFig1AndRefToAncUnkS0',
 		'refToUnkS1',
-		'defCode1AndReferToCode1'
+		'defCode1AndReferToCode1',
+		'defFig1'
 	],
 	#category : 'Microdown-BookTester-Tests',
 	#package : 'Microdown-BookTester-Tests'
@@ -143,6 +144,20 @@ See *@Eq1@*
 ]
 
 { #category : 'helpers - anchors & references' }
+MicReferenceCheckerTest >> defFig1 [
+
+	defFig1 := fs / 'defFig1.md'.
+	(dir / 'figures' / 'f.png') ensureCreateFile.
+	defFig1 ensureCreateFile.
+	defFig1 writeStreamDo: [ :stream |
+		stream nextPutAll: '# Section 1
+![alittle caption. %anchor=Fig1](figures/f.png)
+
+
+' ]
+]
+
+{ #category : 'helpers - anchors & references' }
 MicReferenceCheckerTest >> defFig1AndRefFig1 [
 
 	defAndRefFig1 := dir / 'defAndRefFig1.md'.
@@ -167,7 +182,7 @@ MicReferenceCheckerTest >> defFig1AndRefToAncS0 [
 	defFig1AndRefToAnsC0 ensureCreateFile.
 	defFig1AndRefToAnsC0 writeStreamDo: [ :stream |
 		stream nextPutAll: '# Section 1
-![alittle caption.](figures/f.png anchor=Fig1)
+![alittle caption. %anchor=Fig1](figures/f.png)
 
 See *@ancS0@*
 
@@ -543,8 +558,7 @@ MicReferenceCheckerTest >> testDuplicatedAnchorInDifferentFilesOfTheSameDir [
 MicReferenceCheckerTest >> testDuplicatedAnchors [
 
 	| defAncS0TripleAncS1RefAncS1AncS0 checker dict dup1 |
-	defAncS0TripleAncS1RefAncS1AncS0 := self
-		                                    defAncS0TripleAncS1RefAncS1AncS0.
+	defAncS0TripleAncS1RefAncS1AncS0 := self defAncS0TripleAncS1RefAncS1AncS0.
 	checker := MicReferenceChecker new.
 	checker checkList: { defAncS0TripleAncS1RefAncS1AncS0 }.
 	self deny: checker isOkay.
@@ -887,4 +901,21 @@ MicReferenceCheckerTest >> testUndefinedInputFilesAreMentionedInResult [
 				}  includes: each)
 			]
 
+]
+
+{ #category : 'tests - single file' }
+MicReferenceCheckerTest >> testUnreferencedFigure [
+
+	| visitor badRefs unref |
+	self defFig1.
+	visitor := MicReferenceChecker new.
+	visitor rootDirectory: dir.
+	visitor checkProject: defFig1.
+	self deny: visitor isOkay.
+	badRefs := (visitor results groupedBy: [:each | each class name]) at: #MicUnreferencedFigureResult.
+	unref := badRefs first.
+	self assert: badRefs size equals: 1.
+	self assert: unref figurePath equals: 'figures/f.png'.
+	self assert: unref anchorLabel equals: 'Fig1'.
+	self assert: unref sourceFileReference fullName equals: '/defFig1.md'
 ]
