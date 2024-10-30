@@ -171,12 +171,25 @@ BaselineOfMicrodown >> preload: loader package: packageSpec [
 					forget ] ]"
 
 	| packagesToUnload |
-	packagesToUnload := ((PackageOrganizer default packages select: [ :each | each name beginsWith: 'Microdown' ]) collect: [ :each | each name ]) reject: [ :each |
-		                    #( 'Microdown-RichTextPresenter' 'Microdown-RichTextPresenter-Tests' ) includes: each ].
-	"these two are not managed by the microdown repo but the documentation.
-	I should rename them in the future to avoid confusion"
+	"If it is absent it's because we are in the Pharo bootstrap"
+	self class environment
+		at: #IceRepository
+		ifPresent: [ :iceRepositoryClass |
+			
+			packagesToUnload := ((PackageOrganizer default packages select: [
+				                      :each | each name beginsWith: 'Microdown' ])
+				                     collect: [ :each | each name ]) reject: [
+				                    :each |
+				                    #( 'Microdown-RichTextPresenter'
+				                       'Microdown-RichTextPresenter-Tests' )
+					                    includes: each ].
+				
+			"these two are not managed by the microdown repo but the documentation.
+			I should rename them in the future to avoid confusion"
 
-	packagesToUnload do: [ :each | ((IceRepository repositoryNamed: 'Microdown') packageNamed: each) unload ]
+			packagesToUnload do: [ :each |
+				((iceRepositoryClass repositoryNamed: 'Microdown') packageNamed:
+					 each) unload ] ]
 ]
 
 { #category : 'external projects' }
