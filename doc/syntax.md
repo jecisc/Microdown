@@ -89,9 +89,15 @@ There is potentially an endless number of extensions one would like to add to Mi
 `{!extensionName|parameter1=value1&parameter2=value2&parameter3=value3!}`. What the extension does will typically depend on the vistor ($\LaTeX$ generation, Text generation, HTML generation etc)
 
 Some extensions are already defined in the Microdown library:
-- **inputFile|path=uri** - inserts the contents of the microdown document at uri at this place.
 - **footnote|note=some note which goes to the foot**  - adds a footnote the the generated document
 - **citation|ref=somewhere so others can find it** - adds a reference to the generated document
+
+Note that each extension has the possibility to define a default first key. 
+So `{!citation|ref=Duca99a}` can be expressed as `{!citation|Duca99a}`.
+
+### Microdown paragraph extensions
+
+- **inputFile|path=uri** - inserts the contents of the microdown document at uri at this place.
 
 
 ## Microdown Bloc level elements a.k.a Paragraphs
