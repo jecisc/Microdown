@@ -1,12 +1,24 @@
 # Microdown
 
 Microdown is the Pharo version of markdown. In general it is very close to github markdown, with two major differences and a number of smaller ones.
+Now pay really attention that Microdown is used by the Pillar compilation chain to produce books in PDF, HTML,..., presentations, websites, class comments in Phar. Microdown is not limited to Github rendering. 
+Now it tries its best to achieve a good compromise between rendering on Github, and expressiveness in the other cases. 
 
-Principal differences:
+## Principal differences:
+Microdown supports metadata for figure, equation, ... It allows one to have anchors.
+It supports by default cross-referencing. 
 
-Microdown has a number of extension points to allow new functionality to be added without introducing new markdown syntax. These extensions can be the level of main block such as environments or as inline element (such as footnote, citation). In particular Microdown has support for LaTeX, Pharo defined color highlighting of embedded code, inclusion of one document into another.
+Microdown has a number of extension points to allow new functionality to be added without introducing new markdown syntax. These extensions can be the level of main block such as environments or as inline element (such as footnote or citation). 
 
-Microdown supports metadata for figure, equation, ... It allows one to have anchor.
+In particular Microdown has support for LaTeX, Pharo-defined color highlighting of embedded code, inclusion of one document into another.
+
+Based on this Microdown offers document checkers. By default a checker will report
+- Duplicated anchors
+- References to unknown anchors
+- Unreferenced figures
+- Figure referencing unknown files
+- Reference to unknown included file
+- Invalid code snippets (acting as tests for code sample).
 
 ## Syntax
 [The Syntax Chapter](syntax.md) defines the syntax of Microdown.
