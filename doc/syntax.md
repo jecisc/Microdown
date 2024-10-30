@@ -15,6 +15,23 @@ The syntax covers two distict categories - inline and paragraphs.
 - [Link](https://Pharo.org) is done as `[Link](https://Pharo.org)`. The produced link will open in the standard browser (Pharo `WebBrowser class >> #openOn:`)
 - ![alt text](https://pharo.org/web/files/pharo-logo-small.png) is done using ` ![alt text](https://pharo.org/web/files/pharo-logo-small.png) `.  Often larger figures are done by placing using this syntax on a line by itself
 
+### File level Metadata
+
+Microdown uses JSON to handle file-header metadata as shown after:
+
+```
+{
+"author" : "Stéphane Ducasse",
+"title" : "a cool documentation"
+}
+```
+
+### Bloc parameters
+
+Microdown has a generic way to manage arguments of elements. The syntax is `tag|key1=value1&key2=value2`. 
+
+
+
 ### Anchors and References
 Microdown supports different anchors: at the heading level, math equations and figures.
 
@@ -23,23 +40,59 @@ Microdown supports different anchors: at the heading level, math equations and f
 
 #### Figures
 
+```
+![This is a caption. %width=50&anchor=aFigAnchor](testMicrodown/toplevel.png)
+```
 ![This is a caption. %width=50&anchor=aFigAnchor](testMicrodown/toplevel.png)
 
 Any anchor can be refer to using an anchor reference following this syntax: `*@anAnchor@*`
 
+#### Equations
+
+Using the same mechanism you can define a caption and an anchor of an equation.
+
+```
+$$ %anchor=frac&caption=The crazy equation
+\frac{1}{1+2}
+$$
+```
+
+### Microdown Math 
+
+Microdown supports both inline math using `$` and equation `$$`
+
+`$x^2$` - inline `$\LaTeX$` is done using `$x^2$` (and `$LaTeX$`).
+
+```
+$$ %anchor=frac&caption=The crazy equation
+\frac{1}{1+2}
+$$
+```
+
+produces a fraction. Notice the use of %anchor=frac to place metadata
+
+$$
+\frac{1}{1+2}
+$$
 
 
-### Microdown specials
-- `$x^2$` - inline `$\LaTeX$` is done using `$x^2$` (and `$LaTeX$`).
-- {{**bold**}} can be done also using raw
+### Raw 
+
+Microdown also supports the possibility to express raw text using `{{{` and `}}}`.
+
+```
+{{{**bold**}}}
+```
 
 ### Microdown inline extensions
 There is potentially an endless number of extensions one would like to add to Microdown. Rather than keep inventing new syntax, the generic syntax for inline syntax is:
 `{!extensionName|parameter1=value1&parameter2=value2&parameter3=value3!}`. What the extension does will typically depend on the vistor ($\LaTeX$ generation, Text generation, HTML generation etc)
+
 Some extensions are already defined in the Microdown library:
-- **inputFile|path=uri** - insert the contents of the microdown document at uri at this place.
+- **inputFile|path=uri** - inserts the contents of the microdown document at uri at this place.
 - **footnote|note=some note which goes to the foot**  - adds a footnote the the generated document
 - **citation|ref=somewhere so others can find it** - adds a reference to the generated document
+
 
 ## Microdown Bloc level elements a.k.a Paragraphs
 
@@ -50,13 +103,43 @@ Headers are done by lines starting with `#`. One `#` is the largest header, six 
 
 ### Comments
 It is possible to put comments in the Microdown source. Lines starting with `%` are creates a comment paragraph, but most tools ignore them.
+
+```
 % They really are
+```
 
 ### Quote blocks
 > Lines starting with `>` are supposed to be rendered in an indented manner
 > At present the in-image rendering leaves something to be desired
 >  But it works for now
 Each source line which is part of the quote block need to start with a `>`
+
+```
+> this is a quote block
+> spawning on multiple lines
+```
+
+
+### Annotated paragraphs
+
+Microdown supports annotated paragraphs using `>[! as follows:
+
+```
+>[! Important]
+> yes this is important
+```
+
+### Raw HTML paragraphs
+
+With recent versions of Microdown you can embedded top level HTML blocks.
+
+```
+<address>
+kjlkjljlkj
+hkjhkjh
+<\address>
+```
+
 
 ### Unordered lists
 Unordered list are made by prefixing a line with '-' or `*`.
