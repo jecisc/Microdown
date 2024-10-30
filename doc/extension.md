@@ -31,12 +31,13 @@ Microdown has three paragraph extension points
 ## Mechanism
 The mechanism for extending an Environment or the MathBlock (to do something else than Math) is pretty much the same as for annotations. 
 - Make a subclass of `MicEnvironmentBlock` or `MicMathBlock`.
-- implement the tag on the class side
-- implememnt necessary accessors to help implement the visitors
-- implement `accept:` to interface to the visitor (calling a `visitMyNewExtension:`)
-- implement `visitMyNewExtension:`.
+- Implement the tag on the class side
+- Implememnt necessary accessors to help implement the visitors
+- Implement `accept:` to interface to the visitor (calling a `visitMyNewExtension:`)
+- Implement `visitMyNewExtension:`.
 
 ### Example: support for source code extraction
+
 `MicSourceMethodBlock` allows source code to be inserted into microdown using an extension of the form:
 ```text
 <!source|class=MicSourceMethodBlock&method=tag&side=class!>
@@ -54,6 +55,7 @@ The `accept:` method specify that visiting should be done by visiting the childr
 <!source|class=MicSourceMethodBlock&method=accept:!>
 
 ### Example: support for PlantUml diagrams
+
 [PlantUmlMicrodownExtension](https://github.com/kasperosterbye/PlantUmlMicrodownExtension) is a simple example of extending MicMathBlock to render [plantuml](https://plantuml.com) diagrams inlined in Microdown.
 
 It uses the tag plantUml:
@@ -65,6 +67,7 @@ tag
 and the accept: just tells to `visitPlantUML:`.
 
 In addition it defines `visitPlantUML:` as an extension method on `MicRichTextComposer`
+
 ```Method
 visitPlantUML:  plantUMLNode 
 
@@ -76,5 +79,6 @@ visitPlantUML:  plantUMLNode
 	canvas << ((String value: 1) asText
 		addAttribute: (TextAnchor new anchoredMorph: anchoredImage))
 ```
+
 The `body` of an extension of `MicMathBlock` is all the text between the two `$$`, which in this case is assumed to be a plantUML script. The visit method is rather similar to the standard implementation of Math/Latex support.
 
