@@ -69,7 +69,7 @@ $$ %anchor=frac&caption=The crazy equation
 $$
 ```
 
-produces a fraction. Notice the use of %anchor=frac to place metadata
+produces a fraction. Notice the use of %anchor=frac to define metadata.
 
 $$
 \frac{1}{1+2}
