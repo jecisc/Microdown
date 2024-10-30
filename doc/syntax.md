@@ -126,8 +126,12 @@ Microdown supports annotated paragraphs using `>[! as follows:
 
 ```
 >[! Important]
-> yes this is important
+> Microdown is extensible
 ```
+
+>[! Important]
+> Microdown is extensible
+
 
 ### Raw HTML paragraphs
 
