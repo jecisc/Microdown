@@ -1,10 +1,12 @@
-# Microdown Syntax
+# Microdown syntax
 The syntax covers two distict categories - inline and paragraphs. 
 - Inline commands cover things like emphasis and links.
 - Paragraphs are commands that span several lines of text (lists, code examples, etc). We often named them Bloc level elements. 
 
 
-## Inline syntax
+## Basic inline syntax
+Inline syntax is about elements inside paragraphs.
+
 ### Text emphasis
 - **bold** is done by `**bold**` (You can get \** by `\\**`)  
 - _italics_ is done by `_italics_` (should be underline, but now it stuck, there is no underline)
@@ -12,25 +14,18 @@ The syntax covers two distict categories - inline and paragraphs.
 - `inline code` is done by   \`inline code\`
 
 ### Links and Figure
-- [Link](https://Pharo.org) is done as `[Link](https://Pharo.org)`. The produced link will open in the standard browser (Pharo `WebBrowser class >> #openOn:`)
+- [Link](https://Pharo.org) is done as ` [Link](https://Pharo.org) `. The produced link will open in the standard browser (Pharo `WebBrowser class >> #openOn:`)
 - ![alt text](https://pharo.org/web/files/pharo-logo-small.png) is done using ` ![alt text](https://pharo.org/web/files/pharo-logo-small.png) `.  Often larger figures are done by placing using this syntax on a line by itself
 
-### File level Metadata
 
-Microdown uses JSON to handle file-header metadata as shown after:
 
-```
-{
-"author" : "Stéphane Ducasse",
-"title" : "a cool documentation"
-}
-```
+## Key systematic features
+Microdown offers anchors and references. Most of anchors are expressed using bloc parameters. 
+So we present this basic feature first then show its usage.
 
 ### Bloc parameters
 
 Microdown has a generic way to manage arguments of elements. The syntax is `tag|key1=value1&key2=value2`. 
-
-
 
 ### Anchors and References
 Microdown supports different anchors: at the heading level, math equations and figures.
@@ -84,21 +79,6 @@ Microdown also supports the possibility to express raw text using `{{{` and `}}}
 {{{**bold**}}}
 ```
 
-### Microdown inline extensions
-There is potentially an endless number of extensions one would like to add to Microdown. Rather than keep inventing new syntax, the generic syntax for inline syntax is:
-`{!extensionName|parameter1=value1&parameter2=value2&parameter3=value3!}`. What the extension does will typically depend on the vistor ($\LaTeX$ generation, Text generation, HTML generation etc)
-
-Some extensions are already defined in the Microdown library:
-- **footnote|note=some note which goes to the foot**  - adds a footnote the the generated document
-- **citation|ref=somewhere so others can find it** - adds a reference to the generated document
-
-Note that each extension has the possibility to define a default first key. 
-So `{!citation|ref=Duca99a}` can be expressed as `{!citation|Duca99a}`.
-
-### Microdown paragraph extensions
-
-- **inputFile|path=uri** - inserts the contents of the microdown document at uri at this place.
-
 
 ## Microdown Bloc level elements a.k.a Paragraphs
 
@@ -113,6 +93,18 @@ It is possible to put comments in the Microdown source. Lines starting with `%` 
 ```
 % They really are
 ```
+
+### File level Metadata
+
+Microdown uses JSON to handle file-header metadata as shown after:
+
+```
+{
+"author" : "Stéphane Ducasse",
+"title" : "a cool documentation"
+}
+```
+
 
 ### Quote blocks
 > Lines starting with `>` are supposed to be rendered in an indented manner
@@ -251,3 +243,34 @@ Leaving out the second line merely produce a table without header highlighting.
 | Header1 | Header2 | Header 3 |
 | cell 1 1 | cell 1 2 | cell 1 3 |
 | cell 2 1 | cell 2 2 | cell 2 3 |
+
+## Extensions
+
+### Microdown inline extensions
+There is potentially an endless number of extensions one would like to add to Microdown. Rather than keep inventing new syntax, the generic syntax for inline syntax is:
+`{!extensionName|parameter1=value1&parameter2=value2&parameter3=value3!}`. What the extension does will typically depend on the vistor ($\LaTeX$ generation, Text generation, HTML generation etc)
+
+Some extensions are already defined in the Microdown library:
+- **footnote|note=some note which goes to the foot**  - adds a footnote the the generated document
+- **citation|ref=somewhere so others can find it** - adds a reference to the generated document
+
+Note that each extension has the possibility to define a default first key. 
+So `{!citation|ref=Duca99a}` can be expressed as `{!citation|Duca99a}`.
+
+### Microdown paragraph extensions
+
+Microdown offers a generic way to create new bloc level elements. These can also be nested
+and are close to $\LaTeX$ environments. 
+There are defined using `<!tag|key1=value1&key2=value2!>`
+
+The most common use is the inputFile one: `<!inputFile|path=uri!>` inserts the contents of the microdown document at uri at this place.
+
+## Possible changes in future versions
+
+We are about to revise the syntax of the extension because it conflicts with the introduction of raw paragraph. We are also considering adding element level meta data as in Kramdown. This should let the user defines HTML class at the node level. 
+
+
+
+
+
+
