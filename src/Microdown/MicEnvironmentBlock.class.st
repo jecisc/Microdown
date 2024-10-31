@@ -100,10 +100,13 @@ MicEnvironmentBlock >> addLineAndReturnNextNode: line [
 	"add line to this node. 
 	Notice, the action is allowed to create new nodes in the block tree.
 	Returns the node to handle next line - typically self."
+	
+	
 	| withoutPreTabs |
 	isClosed
 		ifTrue: [ ^ self ].
 	withoutPreTabs := line withoutPreTabs.
+	"Here the withoutPreTabs is probably not necessary because handlingPrefixTabOfLine: should do its job."
 	(self doesLineStartWithStopMarkup: withoutPreTabs)
 		ifTrue: [ ^ self ].
 	firstLine
@@ -194,4 +197,10 @@ MicEnvironmentBlock >> lineStartMarkup [
 MicEnvironmentBlock >> lineStopMarkup [
 	
 	^ EnvironmentClosingBlockMarkup 
+]
+
+{ #category : 'handle' }
+MicEnvironmentBlock >> massageLine: aLine [
+
+	^ aLine withoutPreTabs
 ]

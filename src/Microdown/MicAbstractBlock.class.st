@@ -117,6 +117,13 @@ MicAbstractBlock >> listItemBlockClass [
 	^ MicListItemBlock
 ]
 
+{ #category : 'hooks' }
+MicAbstractBlock >> massageLine: aLine [
+	"In some cases an element may want to massage the line such as removing leading tab. By default we delegate to the parent because environment may contain nodes such as code block and this is this nesting that will determine what should be done with the tab. In such a case the environment should remov the tabs."
+	
+	^ self parent massageLine: aLine
+]
+
 { #category : 'public' }
 MicAbstractBlock >> nestedLevel [ 
 	"Return the nesting level of main blocks. Basically only list increases this."
