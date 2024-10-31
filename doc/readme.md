@@ -13,8 +13,8 @@ Microdown has a number of extension points to allow new functionality to be adde
 In particular, Microdown has support for LaTeX, Pharo-defined color highlighting of embedded code, inclusion of one document into another.
 
 ### Syntax
-[The Syntax Chapter](syntax.md) defines the syntax of Microdown.
-[This Extension Chapter](extension.md) defines the extension mechanisms of Microdown.
+*@[The Syntax Chapter](syntax.md)@* defines the syntax of Microdown.
+*@[This Extension Chapter](extension.md)@* defines the extension mechanisms of Microdown.
 
 
 ### Available checkers
@@ -25,9 +25,9 @@ By default a checker will report:
 - Unreferenced figures,
 - Figures referencing unknown files,
 - References to unknown included file,
-- Invalid code snippets (acting as tests for code sample),
+- Invalid code snippets (acting as tests for code samples),
 - Copied method diverging from their source.
 
 ## API
-An important aspect of Microdown is its API, which allow you to work with Microdown from within Pharo.
-[The Chapter API](api.md) explains the overall architecture of Microdown and the key methods.
+An important aspect of Microdown is its API, which allows you to work with Microdown from within Pharo.
+*@[The Chapter API](api.md)@* explains the overall architecture of Microdown and the key methods.
