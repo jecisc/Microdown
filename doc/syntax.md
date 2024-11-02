@@ -1,11 +1,11 @@
 # Microdown syntax
-The syntax covers two distict categories - inline and paragraphs. 
+The syntax covers two distinct categories - inline and paragraphs. 
 - Inline commands cover things like emphasis and links.
-- Paragraphs are commands that span several lines of text (lists, code examples, etc). We often named them Bloc level elements. 
+- Paragraphs are commands that span several lines of text (lists, code examples, etc). We often named them Bloc-level elements. 
 
 
 ## Basic inline syntax
-Inline syntax is about elements inside paragraphs.
+The inline syntax is about elements inside paragraphs.
 
 ### Text emphasis
 - **bold** is done by `**bold**` (You can get \** by `\\**`)  
