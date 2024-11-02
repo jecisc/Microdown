@@ -28,10 +28,10 @@ So we present this basic feature first then show its usage.
 Microdown has a generic way to manage arguments of elements. The syntax is `tag|key1=value1&key2=value2`. 
 
 ### Anchors and References
-Microdown supports different anchors: at the heading level, math equations and figures.
+Microdown supports different anchors: at the heading level, math equations, and figures.
 
 #### Heading anchors
-`@anAnchor` starting a new line defines the anchor `anAnchor`. This type of anchor is a bloc level element.
+`@anAnchor` starting a new line defines the anchor `anAnchor`. This type of anchor is a bloc-level element.
 
 #### Figures
 
@@ -40,7 +40,8 @@ Microdown supports different anchors: at the heading level, math equations and f
 ```
 ![This is a caption. %width=50&anchor=aFigAnchor](testMicrodown/toplevel.png)
 
-Any anchor can be refer to using an anchor reference following this syntax: `*@anAnchor@*`
+Any anchor can be referred to using an anchor reference following this syntax: `*@anAnchor@*`.
+For example we refer to Figure *@aFigAnchor@*.
 
 #### Equations
 
@@ -178,7 +179,8 @@ Are created by a single line starting with at least three `*` - this works: `***
 *************
 
 ### Code blocks
-To show code one use a tripple  backquote
+To show code one use a triple backquote
+
 ```text
   ```pharo
 	Metacello new
@@ -187,21 +189,27 @@ To show code one use a tripple  backquote
  		load.
   ```
 ```
+
 produces:
+
 ```pharo
   Metacello new
     repository: 'github://svenvc/zinc/repository';
     baseline: 'ZincHTTPComponents';
     load.
 ```
+
 #### Predefind language modifiers
-The `pharo` modifier used above is good for pharo expressions. Often one will show a full method,  and should use `method` to get a better highlighting and coloring of the method header
+
+The `pharo` modifier used above is good for pharo expressions. Often one will show a full method,  and should use `method` to get a better highlighting and coloring of the method header.
+
 ```text
   ```method
     accept: aVisitor
            ^ aVisitor visitCode: self
   ```
 ```
+
 produces:
 
 ```method
@@ -209,7 +217,8 @@ accept: aVisitor
  	^ aVisitor visitCode: self
 ```
 
-Plain unformatted text us made by using the `text` modifier, which will just print the body as is.
+Plain unformatted text is made by using the `text` modifier, which will just print the body as is.
+
 ```text
   ```text
     accept: aVisitor
@@ -217,13 +226,15 @@ Plain unformatted text us made by using the `text` modifier, which will just pri
   ```
 ```
 produces:
+
 ```text
 accept: aVisitor
  	^ aVisitor visitCode: self
 ```
 
 ### Tables
-It is possible to write tables in markup. These tables are intended to be short and not too wide. The cells of the tables can only be markedup with inline markup.
+
+It is possible to write tables in markup. These tables are intended to be short and not too wide. The cells of the tables can only be marked up with inline markup.
 ```text
 | Header1 | Header2 | Header 3 |
 | --- | ---- | --- |
@@ -238,7 +249,7 @@ produces:
 
 **Notice**, unlike some other markdowns, Microdown requires lines to start with `|`. 
 There has to be at least the `---` in the line after the header. 
-Leaving out the second line merely produce a table without header highlighting.
+Leaving out the second line merely produces a table without header highlighting.
 
 | Header1 | Header2 | Header 3 |
 | cell 1 1 | cell 1 2 | cell 1 3 |
@@ -247,8 +258,9 @@ Leaving out the second line merely produce a table without header highlighting.
 ## Extensions
 
 ### Microdown inline extensions
+
 There is potentially an endless number of extensions one would like to add to Microdown. Rather than keep inventing new syntax, the generic syntax for inline syntax is:
-`{!extensionName|parameter1=value1&parameter2=value2&parameter3=value3!}`. What the extension does will typically depend on the vistor ($\LaTeX$ generation, Text generation, HTML generation etc)
+`{!extensionName|parameter1=value1&parameter2=value2&parameter3=value3!}`. What the extension does will typically depend on the visitor ($\LaTeX$ generation, Text generation, HTML generation etc)
 
 Some extensions are already defined in the Microdown library:
 - **footnote|note=some note which goes to the foot**  - adds a footnote the the generated document
@@ -259,7 +271,7 @@ So `{!citation|ref=Duca99a}` can be expressed as `{!citation|Duca99a}`.
 
 ### Microdown paragraph extensions
 
-Microdown offers a generic way to create new bloc level elements. These can also be nested
+Microdown offers a generic way to create new bloc-level elements. These can also be nested
 and are close to $\LaTeX$ environments. 
 There are defined using `<!tag|key1=value1&key2=value2!>`
 
@@ -267,10 +279,4 @@ The most common use is the inputFile one: `<!inputFile|path=uri!>` inserts the c
 
 ## Possible changes in future versions
 
-We are about to revise the syntax of the extension because it conflicts with the introduction of raw paragraph. We are also considering adding element level meta data as in Kramdown. This should let the user defines HTML class at the node level. 
-
-
-
-
-
-
+We are about to revise the syntax of the extension because it conflicts with the introduction of raw paragraphs. We are also considering adding element level meta data as in Kramdown. This should let users define HTML class at the node level.
