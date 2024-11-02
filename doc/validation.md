@@ -61,36 +61,50 @@ The following snippets illustrate the points.
 Here the writer wants to make sure that the expression 3 + 4 returns the correct result 7. He tags the code and use the `>>>` on a separate line. 
 
 ```
-    ```example=true	3 + 4 	>>> 7	```
+    ```example=true
+	3 + 4 
+	>>> 7
+	```
 ```
 
 He can also declare that a given expression is expected to cause a failure using the `expectedFailure` tag as follows.
 
 
 ```
-	```example=true&expectedFailure=true	3 + 4 	>>> 12		
-	```	```
+	```example=true&expectedFailure=true
+	3 + 4 
+	>>> 12		
+	```	
+```
 
 ### Version drift detection
 
-It may happen that as an author you copy and paste a method definition from a class. 
-Then the natural question that will arise if is that copy is still valid in more recent version of the code. 
+As an author, you may copy and paste a method definition from a Pharo class to your book.
+Then the natural question that arises is whether that copy is still valid in a more recent version of the system. 
 
 Imagine that in class `A` you define the method `simpleCode`.
 
 ```
-A>>simpleCode	"The comment of simpleCode"		^ 100 slowFactorial
+A>>simpleCode
+	"The comment of simpleCode"
+	
+	^ 100 slowFactorial
 ```
 
-Imagine that you want to have this method definition in your document and that you want the checker to report if the method changes. You can do it doing using the `sync` key.
+Imagine that you want to have this method definition in your document and that you want the checker to report if the method changes. You can do it using the `sync` key.
 
-```	```sync=true&origin=MicMethodBodySyncTest>>#simpleCode	simpleCode		"The comment of simpleCode"			^ 100 slowFactorial
-	``````
+```
+	```sync=true&origin=MicMethodBodySyncTest>>#simpleCode
+	simpleCode
+		"The comment of simpleCode"
+	
+		^ 100 slowFactorial
+	```
+```
 
-### An architecture to plug analysis.
+### An architecture to plug extra analyses.
 
-Code block are often used to define extensions. The `MicCodeBlockValidator` defines a little mechanism to modularly 
-define new analysis. To declare a new analysis is easy:
+Code blocks are often used to define extensions. The `MicCodeBlockValidator` defines a way to modularly define new analyses. To declare a new analysis is easy:
 
 - You have to define a new class subclass of `MicBookTesterStrategy`
 - This class should define a method `verify:` expecting a code block. 
@@ -99,8 +113,8 @@ define new analysis. To declare a new analysis is easy:
 
 ### Conclusion
 
-Microdown is more than a markdown. In addition to be extensible and having nice features such as references, anchors,  it is a symbiotic markdown for Pharo. 
-Given authors writing books about Pharo can leverage this by building extension and tools that makes them more efficient. 	
+Microdown is more than a Markdown language. In addition, to be extensible and having nice features such as references or anchors,  it is a symbiotic markdown for Pharo. It gives authors of Pharo books a clear advantage with powerful extensions and tools that makes them more efficient. 
+	
 
 
 
