@@ -45,10 +45,11 @@ For example we refer to Figure *@aFigAnchor@*.
 
 #### Equations
 
-Using the same mechanism you can define a caption and an anchor of an equation.
+Using the same mechanism you can define an anchor of an equation.
+If the $LaTeX$ style supports caption for equations (this is not the default in $LaTeX$), you can also define caption using the parameters (i.e., `&caption=A caption.`).
 
 ```
-$$ %anchor=frac&caption=The crazy equation
+$$ %anchor=frac
 \frac{1}{1+2}
 $$
 ```
@@ -60,12 +61,12 @@ Microdown supports both inline math using `$` and equation `$$`
 `$x^2$` - inline `$\LaTeX$` is done using `$x^2$` (and `$LaTeX$`).
 
 ```
-$$ %anchor=frac&caption=The crazy equation
+$$ %anchor=frac
 \frac{1}{1+2}
 $$
 ```
 
-produces a fraction. Notice the use of %anchor=frac to define metadata.
+produces a fraction. Notice the use of `%anchor=frac` to define metadata.
 
 $$
 \frac{1}{1+2}
@@ -89,10 +90,11 @@ Headers are done by lines starting with `#`. One `#` is the largest header, six 
 ##### This is a header level 5, done as `##### This is a header level 5` 
 
 ### Comments
+
 It is possible to put comments in the Microdown source. Lines starting with `%` are creates a comment paragraph, but most tools ignore them.
 
 ```
-% They really are
+% They really are ignored
 ```
 
 ### File level Metadata
@@ -108,6 +110,7 @@ Microdown uses JSON to handle file-header metadata as shown after:
 
 
 ### Quote blocks
+
 > Lines starting with `>` are supposed to be rendered in an indented manner
 > At present the in-image rendering leaves something to be desired
 >  But it works for now
