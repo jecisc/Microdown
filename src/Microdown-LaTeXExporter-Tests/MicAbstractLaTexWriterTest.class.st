@@ -451,9 +451,9 @@ MicAbstractLaTexWriterTest >> testParagraphWithNested [
 { #category : 'tests' }
 MicAbstractLaTexWriterTest >> testQuote [
 
-	self parse: factory quoteSample andCheckWeGet:  '\begin{verbatim}', newLine ,
+	self parse: factory quoteSample andCheckWeGet:  newLine, '\begin{quote}', newLine ,
 																	'Foo', newLine ,
-																	'\end{verbatim}', newLine
+																	'\end{quote}', newLine
 ]
 
 { #category : 'tests - figure/link' }

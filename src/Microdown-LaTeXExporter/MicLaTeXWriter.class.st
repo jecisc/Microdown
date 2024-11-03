@@ -340,7 +340,9 @@ MicLaTeXWriter >> visitQuote: aQuote [
 	canvas newLine.
 	canvas environment
 		name: 'quote';
-		with: [ aQuote children do: [ :each | each accept: self ] ].
+		with: [ 
+			aQuote children do: [ :each | each accept: self ].
+			canvas newLine.].
 
 ]
 
