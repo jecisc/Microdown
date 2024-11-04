@@ -47,6 +47,12 @@ MicFigureBlock >> closeMe [
 	self children do: [ :each | each basicParent: self ].
 ]
 
+{ #category : 'testing' }
+MicFigureBlock >> hasCaption [
+	
+	^ children isNotNil 
+]
+
 { #category : 'printing' }
 MicFigureBlock >> plainText [
 	^ '![', ((self children collect: #plainText) joinUsing: ' '), '](', url ,')'
