@@ -176,7 +176,7 @@ MicEnvironmentBlock >> extractFirstLineFrom: aLine [
 		ifFalse: [ firstLine ]
 ]
 
-{ #category : 'parse support' }
+{ #category : 'initialization' }
 MicEnvironmentBlock >> initialize [
 
 	super initialize.
