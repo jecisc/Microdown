@@ -48,7 +48,7 @@ MicAnnotatedParagraphBlock >> defaultLabel [
 	^ #note
 ]
 
-{ #category : 'testing' }
+{ #category : 'initialization' }
 MicAnnotatedParagraphBlock >> initialize [
 
 	super initialize.

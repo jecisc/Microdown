@@ -30,18 +30,6 @@ MicFigureBlock class >> openingDelimiter [
     ^ FigureNameOpenerMarkup
 ]
 
-{ #category : 'testing' }
-MicFigureBlock >> hasAnchor [
-
-	^ self anchor isNotNil
-]
-
-{ #category : 'testing' }
-MicFigureBlock >> hasCaption [
-	
-	^ captionElements isNotNil 
-]
-
 { #category : 'visiting' }
 MicFigureBlock >> accept: aVisitor [
  	^ aVisitor visitFigure: self
